@@ -39,9 +39,16 @@ This behavior is prompt-driven; the script does not implement a separate schedul
 
 1. Stop voice with Ctrl+C. Copy the ID printed as `Codex: <thread-id>`, or read
    `.state/thread.json` beside `voice.py` after the first delegated request.
-2. Run `codex resume <thread-id>` to continue the same conversation by typing.
+2. Run `uv run voice.py --text` to continue the same conversation in Codex CLI.
+   This reads the saved thread ID and working directory and explicitly supplies
+   the current `prompt.txt`, including `~/.daily` goals and task tracking. Text
+   mode uses Codex authentication and does not require `OPENAI_API_KEY`.
 3. Exit the CLI, then run `uv run voice.py --cwd /path/to/project` with the same
    working directory to resume voice from that conversation.
 
 Do not use `--new` when switching. Use one interface at a time. Conversation
 history resumes; the previous audio session does not.
+
+Plain `codex resume <thread-id>` does not read this repository's `prompt.txt`.
+Use `--text` so prompt edits and daily-record instructions are explicitly applied
+at each switch. It refuses to create a different thread if no saved ID exists.

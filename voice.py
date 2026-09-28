@@ -7,7 +7,7 @@
 Switch between voice and CLI using the same conversation:
 1. Stop voice with Ctrl+C. Its ID is printed as Codex: <thread-id> and saved
    beside this script in .state/thread.json after the first delegated request.
-2. Run codex resume <thread-id> to continue by typing.
+2. Run uv run voice.py --text to resume that thread with the current prompt.txt.
 3. Exit the CLI, then run this script with the same --cwd to resume voice.
 Do not use --new when switching; it starts a different conversation.
 Use one interface at a time. This resumes history, not the prior audio session.
@@ -19,6 +19,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import subprocess
 import sys
 import threading
 import time
@@ -306,28 +307,49 @@ async def voice(args, prompt):
             loop.remove_signal_handler(sig)
 
 
+def resume_text(prompt):
+    state_path = HERE / ".state/thread.json"
+    if not state_path.exists():
+        raise RuntimeError("No saved voice conversation yet. Send a request in voice mode first.")
+    saved = json.loads(state_path.read_text())
+    cwd = Path(saved["cwd"]).resolve(strict=True)
+    if not cwd.is_dir():
+        raise ValueError("Saved working directory is not a directory")
+    return subprocess.run([
+        "codex", "resume", saved["thread_id"], "--cd", str(cwd),
+        "--model", "gpt-6-astra", "--enable", "multi_agent",
+        "--config", "developer_instructions=" + json.dumps(prompt, ensure_ascii=False),
+    ], check=False).returncode
+
+
 def main():
-    from dotenv import load_dotenv
-    load_dotenv(HERE / ".env")
-    if not os.environ.get("OPENAI_API_KEY", "").strip():
-        print("Missing OPENAI_API_KEY. Set it in your environment or .env next to voice.py.", file=sys.stderr)
-        return 1
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cwd", type=Path, default=Path.cwd(), help="Codex working directory")
+    parser.add_argument("--cwd", type=Path, default=Path.cwd(), help="Codex working directory for voice; text uses the saved directory")
     parser.add_argument("--prompt", type=Path, default=HERE / "prompt.txt")
+    parser.add_argument("--text", action="store_true", help="Resume the saved thread in Codex CLI with the current prompt")
     parser.add_argument("--new", action="store_true", help="Start a fresh Codex conversation")
     parser.add_argument("--check", action="store_true", help="Billable connection check, without microphone or speaker")
     parser.add_argument("--duration", type=float, help="Stop voice after this many seconds")
     args = parser.parse_args()
+    if args.text and (args.new or args.check or args.duration is not None):
+        parser.error("--text cannot be combined with --new, --check, or --duration")
+    if not args.text:
+        from dotenv import load_dotenv
+        load_dotenv(HERE / ".env")
+        if not os.environ.get("OPENAI_API_KEY", "").strip():
+            print("Missing OPENAI_API_KEY. Set it in your environment or .env next to voice.py.", file=sys.stderr)
+            return 1
     try:
+        prompt = args.prompt.read_text().strip()
+        if not prompt:
+            raise ValueError("Prompt file is empty")
+        if args.text:
+            return resume_text(prompt)
         args.cwd = args.cwd.resolve(strict=True)
         if not args.cwd.is_dir():
             raise ValueError("--cwd must be a directory")
         if args.duration is not None and args.duration <= 0:
             raise ValueError("--duration must be positive")
-        prompt = args.prompt.read_text().strip()
-        if not prompt:
-            raise ValueError("Prompt file is empty")
         if args.new:
             (HERE / ".state/thread.json").unlink(missing_ok=True)
         asyncio.run(voice(args, prompt))
