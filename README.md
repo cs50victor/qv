@@ -28,3 +28,9 @@ seconds. API access and Codex authentication are separate requirements.
 
 `~/.daily` is created by the agent only when work needs recording. Journal sync and
 automatic idle task announcements are not implemented.
+
+The user talks to one persistent coordinator throughout the day. Set daily goals,
+change priorities, or ask "Where are we on today's goals?" The prompt tells Astra
+to delegate execution, track dependencies and worker IDs in `~/.daily`, verify
+results, and report status by goal without requiring worker-session switching.
+This behavior is prompt-driven; the script does not implement a separate scheduler.
