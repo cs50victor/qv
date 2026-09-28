@@ -197,7 +197,7 @@ async def voice(args, prompt):
             options = dict(model="gpt-6-astra", cwd=str(args.cwd),
                            sandbox=Sandbox.full_access, approval_mode=ApprovalMode.deny_all,
                            config={"features.multi_agent": True},
-                           developer_instructions=prompt + "\nYou are the Codex reasoning orchestrator. "
+                           developer_instructions=prompt + "\nCurrent interface: voice mode. You are the Codex reasoning orchestrator. "
                            "GPT Live handles audio. You receive transcripts; do not claim to hear audio. "
                            "Use native Codex subagents for substantial work, not Queue desktop MCP tools. "
                            "Keep your own turns short so the user can keep talking. "
@@ -315,10 +315,19 @@ def resume_text(prompt):
     cwd = Path(saved["cwd"]).resolve(strict=True)
     if not cwd.is_dir():
         raise ValueError("Saved working directory is not a directory")
+    instructions = prompt + (
+        "\nCurrent interface: Codex CLI text mode. The user is typing directly to you; "
+        "no voice session, microphone, audio output, or GPT Live relay is connected. "
+        "Respond directly in written Markdown, with code and detail when useful. "
+        "Do not behave as a speech backend, wait for voice delegation, or claim to "
+        "hear or speak. Earlier voice-mode instructions describe the previous interface, "
+        "not this one. Continue as the same Astra orchestrator with the same goals, "
+        "workers, conversation history, and ~/.daily records."
+    )
     return subprocess.run([
         "codex", "resume", saved["thread_id"], "--cd", str(cwd),
         "--model", "gpt-6-astra", "--enable", "multi_agent",
-        "--config", "developer_instructions=" + json.dumps(prompt, ensure_ascii=False),
+        "--config", "developer_instructions=" + json.dumps(instructions, ensure_ascii=False),
     ], check=False).returncode
 
 

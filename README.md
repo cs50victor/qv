@@ -42,7 +42,9 @@ This behavior is prompt-driven; the script does not implement a separate schedul
 2. Run `uv run voice.py --text` to continue the same conversation in Codex CLI.
    This reads the saved thread ID and working directory and explicitly supplies
    the current `prompt.txt`, including `~/.daily` goals and task tracking. Text
-   mode uses Codex authentication and does not require `OPENAI_API_KEY`.
+   mode explicitly tells Astra there is no audio or GPT Live relay and to respond
+   in written Markdown. It uses Codex authentication and does not require
+   `OPENAI_API_KEY`.
 3. Exit the CLI, then run `uv run voice.py --cwd /path/to/project` with the same
    working directory to resume voice from that conversation.
 
