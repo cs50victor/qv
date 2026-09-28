@@ -2,7 +2,16 @@
 # requires-python = ">=3.11"
 # dependencies = ["openai[realtime]==3.19.2", "openai-codex==0.157.1", "sounddevice>=0.5,<0.6", "python-dotenv>=1.1,<2"]
 # ///
-"""GPT Live voice with a persistent Astra Codex orchestrator. Run: uv run voice.py"""
+"""GPT Live voice with a persistent Astra Codex orchestrator. Run: uv run voice.py
+
+Switch between voice and CLI using the same conversation:
+1. Stop voice with Ctrl+C. Its ID is printed as Codex: <thread-id> and saved
+   beside this script in .state/thread.json after the first delegated request.
+2. Run codex resume <thread-id> to continue by typing.
+3. Exit the CLI, then run this script with the same --cwd to resume voice.
+Do not use --new when switching; it starts a different conversation.
+Use one interface at a time. This resumes history, not the prior audio session.
+"""
 import argparse
 import asyncio
 import base64

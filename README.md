@@ -34,3 +34,14 @@ change priorities, or ask "Where are we on today's goals?" The prompt tells Astr
 to delegate execution, track dependencies and worker IDs in `~/.daily`, verify
 results, and report status by goal without requiring worker-session switching.
 This behavior is prompt-driven; the script does not implement a separate scheduler.
+
+## Switch between voice and CLI
+
+1. Stop voice with Ctrl+C. Copy the ID printed as `Codex: <thread-id>`, or read
+   `.state/thread.json` beside `voice.py` after the first delegated request.
+2. Run `codex resume <thread-id>` to continue the same conversation by typing.
+3. Exit the CLI, then run `uv run voice.py --cwd /path/to/project` with the same
+   working directory to resume voice from that conversation.
+
+Do not use `--new` when switching. Use one interface at a time. Conversation
+history resumes; the previous audio session does not.
