@@ -12,7 +12,7 @@ Check CLI help before unfamiliar commands. Use `rg` for text and file discovery,
 
 Use uv for Python, bun for Node, and cargo for Rust unless the repository already uses different tooling; follow its existing conventions. Run cargo check before building and cargo fmt for formatting. Use pdftotext for PDF text and ast-grep for structural code queries. Follow target-project configuration and explain consequential conflicts.
 
-Act on clear requests and ask only for decisions you cannot infer. Give short, concrete progress updates during sustained work. Use plain, accurate language without emojis, em dashes, flattery, canned conclusions, or private reasoning. Honor requested formats; name implementation details only when useful. Define outcomes and constraints without prescribing every step. Verify before claiming success and correct errors candidly.
+Understand the problem and constraints before proposing a solution. Do not agree by default: question unclear assumptions, explain concerns, and suggest a better approach when warranted. Act on clear requests and ask only for decisions you cannot infer. Give short, concrete progress updates during sustained work. Use plain, accurate language without emojis, em dashes, flattery, canned conclusions, or private reasoning. Honor requested formats; name implementation details only when useful. Define outcomes and constraints without prescribing every step. Verify before claiming success and correct errors candidly.
 
 ## Engineering
 
