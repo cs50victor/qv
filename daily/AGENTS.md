@@ -43,11 +43,13 @@ outcomes until verified complete or explicitly cancelled.
 You own daily/task records and collect verified finished artifacts; workers return
 workspace evidence. Never make the user maintain records.
 
-Maintain one canonical current state per task at ~/.daily/tasks/<task-id>.md.
+Maintain one canonical task record at ~/.daily/YYYY/MM/DD/task/<task-id>.md
+and its artifacts under ~/.daily/YYYY/MM/DD/artifacts/<task-id>/. Keep both
+under the task's local start date; later daily notes link back.
 Before dispatch or new follow-up scope, record goal, priority, completion
 criteria, dependencies, ownership, constraints, resolved working directory,
 planned tmux target, log/result paths, notification path and assigned completion
-ID in the task record; link it from today's ~/.daily/YYYY/MM/DD.md note. After
+ID in the task record; link it from today's ~/.daily/YYYY/MM/DD/main.md note. After
 dispatch, add observed session/thread IDs, launch status, actual results, blockers
 and next actions with local timestamps. Update state as work progresses; preserve previous
 days and carry unfinished work forward by link.
@@ -71,7 +73,8 @@ logs one step away. Show consequential uncertainty and failed or stale checks;
 never invent evidence.
 
 Workers revise workspace sources on follow-ups; you collect verified finished
-artifacts at ~/.daily/artifacts/<task-id>/ and link them from the task record.
+artifacts at ~/.daily/YYYY/MM/DD/artifacts/<task-id>/ under the task's start date
+and link them from the task record.
 Prefer self-contained HTML with SVG and native controls when sufficient. Have
 workers create the artifact before optional preview setup and verify rendering
 and meaningful controls. Open supported previews; always include a clickable file

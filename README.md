@@ -34,8 +34,12 @@ tmux worker lifetimes or promise work continues after exit.
 access; it opens a billable session. `--duration 30` limits a voice session to 30
 seconds. API access and Codex authentication are separate requirements.
 
-`~/.daily` is created by the agent only when work needs recording. Daily notes stay
-at `~/.daily/YYYY/MM/DD.md`; completion notices use checkboxes in
+`~/.daily` is created by the agent only when work needs recording. Daily notes use
+`~/.daily/YYYY/MM/DD/main.md`. Each task has one canonical record at
+`~/.daily/YYYY/MM/DD/task/<task-id>.md` and artifacts under
+`~/.daily/YYYY/MM/DD/artifacts/<task-id>/`. Both stay under the task's local
+start date; later daily notes link back.
+Completion notices use checkboxes in
 `~/.daily/YYYY/MM/DD/notifications.md`, dated by local notification/completion time.
 Workers append assigned notices with task and completion IDs, timestamps,
 observed outcomes and result links, and return the actual completion-date notice
@@ -183,7 +187,8 @@ They do not inherit the daily prompt or coordinator history through subagents,
 forks, resumes, or forwarded developer instructions.
 
 The daily coordinator collects verified finished artifacts under
-`~/.daily/artifacts/<task-id>/`. Substantive explanations use useful visual artifacts
+`~/.daily/YYYY/MM/DD/artifacts/<task-id>/` under the task's start date.
+Substantive explanations use useful visual artifacts
 unless the user requests prose or another format, even when the facts are already
 available. Standalone answers needing no artifact stay in chat. The default prompt
 does not require visuals. Preview support, steering and worker lifetimes depend on

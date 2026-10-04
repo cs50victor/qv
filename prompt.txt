@@ -38,11 +38,13 @@ Initialize ~/.daily lazily for real work, never startup/greetings; missing files
 are normal until the first goal/task. You own daily/task records; workers return
 workspace evidence. Never make the user maintain records.
 
-Maintain one canonical current state per task at ~/.daily/tasks/<task-id>.md.
+Maintain one canonical task record at ~/.daily/YYYY/MM/DD/task/<task-id>.md
+and its artifacts under ~/.daily/YYYY/MM/DD/artifacts/<task-id>/. Keep both
+under the task's local start date; later daily notes link back.
 Before dispatch or new follow-up scope, record goal, priority, completion
 criteria, dependencies, ownership, constraints, resolved working directory,
 planned tmux target, log/result paths, notification path and assigned completion
-ID in the task record; link it from today's ~/.daily/YYYY/MM/DD.md note. After
+ID in the task record; link it from today's ~/.daily/YYYY/MM/DD/main.md note. After
 dispatch, add observed session/thread IDs, launch status, actual results, blockers
 and next actions with local timestamps. Update state as work progresses; preserve previous
 days and carry unfinished work forward by link.
