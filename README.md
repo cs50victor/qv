@@ -35,20 +35,43 @@ to delegate execution, track dependencies and worker IDs in `~/.daily`, verify
 results, and report status by goal without requiring worker-session switching.
 This behavior is prompt-driven; the script does not implement a separate scheduler.
 
-The shared prompt keeps chat brief and uses visual artifacts for substantive
-explanations: diagrams, drawings, interactive HTML, and Manim videos when motion
-helps or a video is requested. Artifacts and editable sources live under
-`~/.daily/artifacts/<task-id>/`, linked from the existing task record. Simple
-answers stay in chat; important blockers remain visible. Voice gives a short
-spoken outcome while Codex produces the artifact. Rendering and previews depend
-on the installed tools and interface; the prompt reports unverified results.
+## Daily visual workspace
 
-[`AGENTS.md`](AGENTS.md) contains the complete global instructions, including the
-visual-response preference, ready to copy and paste into `~/.codex/AGENTS.md`.
-If that path is a symlink, the change also applies wherever its target is used.
-Start a new conversation to verify the guidance is loaded. An
-`~/.codex/AGENTS.override.md` takes precedence over `AGENTS.md`. qv's coordinator
-and `~/.daily` task-tracking rules remain in `prompt.txt`.
+[`AGENTS.md`](AGENTS.md) is the complete, concise prompt for the daily coordinator,
+combining visual explanations with evidence, tool, engineering, coordination,
+and verification preferences; it does not require the dev-preferences skill.
+Copy its contents into `~/.daily/AGENTS.md` and select `~/.daily` as the Codex app
+project directory, or start the CLI there:
+
+```sh
+mkdir -p ~/.daily
+cp AGENTS.md ~/.daily/AGENTS.md
+codex --cd ~/.daily
+```
+
+Inspect any existing destination file before replacing it. Keep these instructions
+in the daily workspace, not in your global `~/.codex/AGENTS.md`; sessions elsewhere
+retain their existing guidance. Start a new conversation to load the new file.
+Codex loads project guidance from the project root to the current directory;
+without a detected project root it checks only the current directory, so start
+from `~/.daily` rather than assuming a nested folder inherits this file.
+
+Substantive explanations become diagrams, drawings, interactive HTML, or rendered
+Manim videos when motion helps; simple answers and requested prose stay in chat.
+Artifacts and sources live in `~/.daily/artifacts/<task-id>/`, linked from the task
+record. Actual preview support, steering, and worker lifetimes depend on the
+runtime; the prompt reports unverified behavior.
+
+For the optional voice interface, explicitly supply the same daily prompt:
+
+```sh
+uv run voice.py --cwd ~/.daily --prompt ~/.daily/AGENTS.md
+uv run voice.py --text --prompt ~/.daily/AGENTS.md
+```
+
+Use one interface at a time and the same prompt when switching. The default
+`prompt.txt` retains qv's existing voice coordinator; it does not install these
+visual preferences globally.
 
 ## Switch between voice and CLI
 
