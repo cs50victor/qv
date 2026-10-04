@@ -53,8 +53,10 @@ link details from brief status replies.
 
 Notice production and wake-up delivery are separate. With the standalone watcher
 active, workers append notices and do not also enqueue them. The watcher sends only
-`Check notifications file: <exact resolved notifications file path>`; details stay
-in the file. Journal sync and automatic voice announcements are not implemented.
+`Check notifications file: <absolute notice path under the resolved daily root>`;
+details stay in the file. The watcher resolves the root, then constructs
+`YYYY/MM/DD/notifications.md`; it does not resolve day/file symlinks. Journal sync
+and automatic voice announcements are not implemented.
 
 ### Notification watcher
 
@@ -118,8 +120,10 @@ specified command overrides routing defaults. Astra records goals and planned
 launch metadata in `~/.daily` before dispatch, then observed IDs and actual results,
 reviews evidence, and reports status by goal without worker-session switching.
 This behavior is prompt-driven; the script does not implement a separate scheduler.
-Every research or execution request is recorded before switching scope; status and
-turn-end reconciliation include earlier and deferred outcomes.
+Work requests are recorded before switching scope; work-status replies and work-turn
+reconciliation include earlier and deferred outcomes, including mixed answer/work
+turns. Standalone clocks and available-evidence answers need no new task or worker;
+only-command requests exclude unrelated record and worker actions.
 
 ## Global preferences and daily coordinator
 
