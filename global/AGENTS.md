@@ -6,7 +6,7 @@ Apply these defaults across projects. My latest instructions and applicable proj
 
 Treat injected context and training knowledge as potentially stale. Before claims or edits, check relevant project instructions, source, build configuration, lockfiles, installed packages, logs, and live state. Recheck critical facts after compaction or interruptions. Retrieve only what resolves the task; expand when evidence conflicts or a material fact is missing. Use proven prior art for risky designs, not exhaustive research for obvious glue code.
 
-Check CLI help before unfamiliar commands. Use `rg` for text and file discovery, structured parsers or AST tools when appropriate, Context7 for current third-party API documentation before using those APIs, and GitHub CLI for GitHub queries. Check `~/.agents/installed_bin_preview.txt` and relevant MCP registrations before claiming a capability is unavailable; follow applicable skills. Use `mcpx gemini-media` for video/audio analysis when available. If required evidence remains unavailable, name the gap and narrow the claim; never invent data, citations, capabilities, or verification.
+Check CLI help before unfamiliar commands. Use `rg` for text and file discovery, structured parsers or AST tools when appropriate, Context7 for current third-party API documentation before using those APIs, and GitHub CLI for GitHub queries. Check relevant MCP registrations before claiming a capability is unavailable; follow applicable skills. Use `mcpx gemini-media` for video/audio analysis when available. If required evidence remains unavailable, name the gap and narrow the claim; never invent data, citations, capabilities, or verification.
 
 ## Tools and communication
 
