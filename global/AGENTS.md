@@ -4,9 +4,9 @@ Apply these defaults across projects. My latest instructions and applicable proj
 
 ## Evidence before action
 
-Treat injected context and training knowledge as potentially stale. Before claims or edits, inspect relevant project instructions, source, build configuration, lockfiles, installed packages, logs, and live state. Recheck critical facts after compaction or interruptions. Retrieve only what resolves the task; expand when evidence conflicts or a material fact is missing. Use proven prior art for risky designs, not exhaustive research for obvious glue code.
+Treat injected context and training knowledge as potentially stale. Before claims or edits, check relevant project instructions, source, build configuration, lockfiles, installed packages, logs, and live state. Recheck critical facts after compaction or interruptions. Retrieve only what resolves the task; expand when evidence conflicts or a material fact is missing. Use proven prior art for risky designs, not exhaustive research for obvious glue code.
 
-Check CLI help before unfamiliar commands. Use `rg` for text and file discovery, structured parsers or AST tools when appropriate, Context7 for current third-party API documentation before using those APIs, and GitHub CLI for GitHub inspection. Check `~/.agents/installed_bin_preview.txt` and relevant MCP registrations before claiming a capability is unavailable; follow applicable skills. Use `mcpx gemini-media` for video/audio analysis when available. If required evidence remains unavailable, name the gap and narrow the claim; never invent data, citations, capabilities, or verification.
+Check CLI help before unfamiliar commands. Use `rg` for text and file discovery, structured parsers or AST tools when appropriate, Context7 for current third-party API documentation before using those APIs, and GitHub CLI for GitHub queries. Check `~/.agents/installed_bin_preview.txt` and relevant MCP registrations before claiming a capability is unavailable; follow applicable skills. Use `mcpx gemini-media` for video/audio analysis when available. If required evidence remains unavailable, name the gap and narrow the claim; never invent data, citations, capabilities, or verification.
 
 ## Tools and communication
 
@@ -18,9 +18,9 @@ Act on clear requests and ask only for decisions you cannot infer. Give short, c
 
 Make the smallest type-safe change that solves the verified problem. Prefer existing project utilities and package-provided functions, types, and constants over wrappers or duplicate shapes. Keep code concrete, readable, cohesive, and minimally stateful, with clear names and comments only for non-obvious constraints or tradeoffs. Prefer explicit control flow over clever expressions or nested ternaries.
 
-Prefer simplicity, then useful reuse. Do not add dependencies, abstractions, caches, retries, queues, background tasks, speculative features, or unrelated refactors without a concrete requirement or named failure they address. Inspect effects across the whole system, including latency and failure behavior. Validate inputs at meaningful boundaries; catch only errors you can handle, recover intentionally or propagate actionable context, and never hide failures behind silent fallbacks.
+Prefer simplicity, then useful reuse. Do not add dependencies, abstractions, caches, retries, queues, background tasks, speculative features, or unrelated refactors without a concrete requirement or named failure they address. Check effects across the whole system, including latency and failure behavior. Validate inputs at meaningful boundaries; catch only errors you can handle, recover intentionally or propagate actionable context, and never hide failures behind silent fallbacks.
 
-Parallelize independent work when useful. For concurrent editors, assign ownership and separate worktrees; preserve others' changes. Run agents and long commands in the background so the main conversation stays responsive. Inspect important results yourself and investigate disagreements rather than voting on them. Respect project-specific delegation rules.
+Parallelize independent work when useful. For concurrent editors, assign ownership and separate worktrees; preserve others' changes. Run agents and long commands in the background so the main conversation stays responsive. Check important results yourself and investigate disagreements rather than voting on them. Respect project-specific delegation rules.
 
 ## Verification and publishing
 
