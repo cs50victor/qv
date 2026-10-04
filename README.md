@@ -58,27 +58,45 @@ in the file. Journal sync and automatic voice announcements are not implemented.
 
 ### Notification watcher
 
-From a checkout containing `watch_notifications.py`, start one process per
-coordinator in detached tmux; replace the project path and thread ID below:
+From your coordinator's own native shell tool, validate `CODEX_THREAD_ID` as a UUID
+and compare verified current-thread metadata when available. Missing, malformed, or
+conflicting identity blocks launch. Capture it before tmux; never substitute a worker
+ID, recent rollout, or session-tree-root `CODEX_SESSION_ID`. Obtain any required
+owning-server endpoint from the known connection and check `codex queue --help` in
+the actual launch environment.
+
+Record the watcher owner, resolved daily root/script, target, tmux target, and
+writable log path before launch. Use at most one active watcher for the shared daily root;
+unknown existing ownership blocks another. After these checks, replace the checkout
+and log paths below. The shell guard checks absence only; UUID and metadata
+validation are preceding coordinator steps, not implemented by this snippet:
 
 ```sh
+coordinator_thread_id="${CODEX_THREAD_ID:?current coordinator tool ID is required}"
 tmux new-session -d -s qv-notifications -c /path/to/qv \
-  'uv run watch_notifications.py --thread COORDINATOR_THREAD_ID'
+  sh -c 'exec uv run watch_notifications.py --thread "$1" >"$2" 2>&1' \
+  sh "$coordinator_thread_id" /path/to/qv-notifications.log
 ```
 
-For qv, copy the startup `Codex: <thread-id>` value or the `thread_id` in
-`.state/thread.json` after the first request. In Codex CLI, select session ID in
-`/statusline`; in the app, `/status` shows the chat ID. For a remote owning server,
-add `--remote <owning-server-endpoint>` to the quoted watcher command; CLI `/status`
-shows the connected remote address. The watcher also supports `--daily-root`
-(default `~/.daily`) and `--interval` (default 5 seconds).
+The detached shell receives the captured ID as an argument. For a remote owning
+server, add `--remote <owning-server-endpoint>` to the watcher command. qv prints SDK
+`thread.id` at startup and saves it in `.state/thread.json` after the first request;
+saved state must belong to the active invocation. CLI `/statusline` exposes
+`thread-id` (legacy alias `session-id`); remote CLI `/status` can display its
+connected address. These UI commands are separate from the model's shell-tool
+identity lookup. The watcher supports `--daily-root` (default `~/.daily`) and
+`--interval` (default 5 seconds).
 
-The watcher follows the local date and checks that day's `notifications.md` line
-count. A missing file is normal. A changed count, or an existing file without a
-marker, causes `codex queue --thread ID --message <short-file-pointer>`, with
+The watcher checks immediately, then waits five seconds after each check by
+default. Slow queue calls delay the next check. Each check follows the local date
+and reads that day's `notifications.md` line count. A missing file is normal. A
+changed count, or an existing file without a marker, causes
+`codex queue --thread ID --message <short-file-pointer>`, with
 `--remote` when supplied. The same day's `.notifications-enqueued-lines` persists
-the last successfully enqueued count and advances only after queue exit 0. Failed
-enqueue leaves the marker unchanged for the next ordinary check; failure to save
+the last successfully enqueued count, shared across targets, and advances only
+after queue exit 0. On retargeting, stop only your owned watcher and preserve the
+marker; review unchecked notices independently of count. Failed enqueue leaves the
+marker unchanged for the next ordinary check; failure to save
 the marker after acceptance can cause a duplicate pointer. Same-count checkbox
 edits do not ping. Resume/status review still handles unchecked or linked older
 notices even when their count has not changed.
@@ -149,9 +167,14 @@ uv run voice.py --text --prompt ~/.daily/AGENTS.md
 Use one interface at a time and the same `--prompt` selection when switching;
 omitting it selects `prompt.txt` in either interface. Both prompts keep daily
 records under your ownership; workers keep intermediate workspace outputs, with
-assigned notification appends as the only exception. Appends and acknowledgements
-must preserve concurrent edits; the prompts require a shared exclusive file-edit
-lock and rereading current content, not an installed notifier or locking helper.
+assigned notification appends and their directory and lock operations as the only
+exception. All producers and acknowledgers use the same persistent
+`.notifications.lock` beside that day's `notifications.md`,
+opened in append mode and locked with Python standard-library
+`fcntl.flock(handle, fcntl.LOCK_EX)`. Hold the handle while rereading/editing notices
+and close it on completion or error; never unlink or replace the lock file. Worker
+permissions must cover assigned notice-directory/lock operations on the first day
+and at rollover. This is a prompt contract, with no installed locking helper.
 
 ## Switch between voice and CLI
 

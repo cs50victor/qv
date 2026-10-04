@@ -225,6 +225,25 @@ class NotificationTests(unittest.TestCase):
         self.assertIn("codex queue exited 7", errors.getvalue())
         self.assertIn("acceptance only", output.getvalue())
 
+    def test_cli_rejects_invalid_launch_inputs_before_queueing(self):
+        """Missing target and invalid interval fail at the launch boundary."""
+        script = Path(watcher.__file__).resolve()
+        invalid = [
+            ([], "--thread"),
+            (["--thread", " "], "--thread must not be empty"),
+        ]
+        for value in ["0", "-1", "nan", "inf"]:
+            invalid.append((["--thread", "disposable-thread", f"--interval={value}"],
+                            "--interval must be a finite positive number"))
+        for arguments, diagnostic in invalid:
+            with self.subTest(arguments=arguments):
+                result = subprocess.run([sys.executable, str(script), *arguments,
+                                         "--daily-root", str(self.daily)],
+                                        capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn(diagnostic, result.stderr)
+        self.assertEqual(self.argv(), [])
+
 
 if __name__ == "__main__":
     unittest.main()

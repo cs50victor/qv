@@ -2,7 +2,7 @@
 # requires-python = ">=3.11"
 # dependencies = []
 # ///
-"""Check today's notifications every five seconds and enqueue a file pointer."""
+"""Check today's notifications immediately, then sleep five seconds after each check by default."""
 
 import argparse
 from dataclasses import dataclass
@@ -100,7 +100,7 @@ def main() -> int:
     parser.add_argument("--daily-root", type=Path, default=Path("~/.daily"),
                         help="Daily records root (default: ~/.daily)")
     parser.add_argument("--interval", type=float, default=5,
-                        help="Seconds between checks (default: 5)")
+                        help="Seconds to sleep after each check (default: 5)")
     args = parser.parse_args()
     if not args.thread.strip():
         parser.error("--thread must not be empty")
