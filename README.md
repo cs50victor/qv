@@ -41,7 +41,10 @@ seconds. API access and Codex authentication are separate requirements.
 start date; later daily notes link back.
 
 Use [daily/main.template.html](daily/main.template.html) as a standalone starting
-point. It has synthetic examples of all four agent-updated states: neutral
+point. Replace `YYYY-MM-DD`, the four labeled example tasks and their self-contained
+anchors with your date, tasks and record links. The colored legend filters by status;
+All restores every row. Filtering needs JavaScript. It has examples of all four
+agent-updated states: neutral
 unchecked (not started), yellow indeterminate (in progress), green checked
 (completed), and red unchecked with a blocked marker and visible reason (blocked).
 Each row has a stable task ID and authoritative `data-status`; JavaScript derives

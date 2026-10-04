@@ -1,5 +1,8 @@
 # Daily checklist validation
 
+Historical checks of the initial template in commit `e0f2f67`, before progress
+filters were added. The preview and browser results below describe that version.
+
 [Desktop preview](main.template.preview.png) contains synthetic example tasks only.
 
 Validated with Chromium 145.0.7632.6 on October 4, 2026, using the local HTML file:
