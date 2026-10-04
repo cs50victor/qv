@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daily checklist example</title>
+  <title>Daily checklist | YYYY-MM-DD</title>
   <!-- Play CDN is for local development; the inline CSS also works offline. -->
   <script async src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
@@ -14,7 +14,6 @@
     p { margin: .4rem 0; }
     .legend, .context { color: #525252; font-size: .875rem; }
     .legend { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin: .8rem 0; }
-    .legend span { white-space: nowrap; }
     .tasks { list-style: none; padding: 0; margin: 1.4rem 0; }
     .task { margin: 0; padding: .8rem 0; border-bottom: 1px solid #e5e5e5; }
     .task-line { display: flex; align-items: baseline; gap: .65rem; }
@@ -34,47 +33,52 @@
     [data-status="in-progress"] .state-box::after { color: #422006; }
     .swatch { display: inline-block; width: .7rem; height: .7rem; background: var(--state-color); border: 1px solid var(--state-color); }
     [data-status="not-started"] .swatch { background: white; }
-    .task-note { margin: .4rem 0 0 1.75rem; color: #525252; font-size: .875rem; }
     .blocker { color: #991b1b; margin: .4rem 0 0 1.75rem; }
     details { margin: .5rem 0 0 1.75rem; }
     summary { cursor: pointer; color: #525252; font-size: .875rem; }
-    .notes { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .9rem; }
-    .history { margin: 1.5rem 0; }
     :focus-visible { outline: 2px solid #24568a; outline-offset: 3px; }
+
+    .legend.progress-filter { gap: .4rem; }
+    .progress-filter button { font: inherit; font-size: .875rem; line-height: 1.5; color: #525252; background: #fff; border: 1px solid #d4d4d4; border-radius: .3rem; padding: .25rem .65rem; cursor: pointer; }
+    .progress-filter button:hover { background: #f5f5f5; }
+    .progress-filter button[aria-pressed="true"] { color: #202020; background: #e5e5e5; border-color: #737373; }
+    .progress-filter-empty { flex-basis: 100%; margin: .2rem 0 0; color: #525252; font-size: .875rem; }
+    .progress-filter-empty[hidden], .tasks > .task.progress-filter-hidden { display: none; }
   </style>
 </head>
 <body class="mx-auto max-w-4xl px-4 py-8 text-neutral-900">
-  <h1>Daily checklist example</h1>
-  <p class="context">Synthetic examples. Copy this page into the local day directory and replace the task rows and notes.</p>
-  <div class="legend" aria-label="Status legend">
-    <span data-status="not-started"><i class="swatch" aria-hidden="true"></i> Not started</span>
-    <span data-status="in-progress"><i class="swatch" aria-hidden="true"></i> In progress</span>
-    <span data-status="completed"><i class="swatch" aria-hidden="true"></i> Completed</span>
-    <span data-status="blocked"><i class="swatch" aria-hidden="true"></i> Blocked</span>
+  <h1>Daily checklist: YYYY-MM-DD</h1>
+  <p class="context">Example tasks only. Replace the date, task rows and notes when copying this page.</p>
+  <div id="progress-filter" class="legend progress-filter" role="group" aria-label="Filter tasks by progress">
+    <button type="button" data-progress-filter="all" aria-pressed="true">All</button>
+    <button type="button" data-progress-filter="not-started" data-status="not-started" aria-pressed="false"><i class="swatch" aria-hidden="true"></i> Not started</button>
+    <button type="button" data-progress-filter="in-progress" data-status="in-progress" aria-pressed="false"><i class="swatch" aria-hidden="true"></i> In progress</button>
+    <button type="button" data-progress-filter="completed" data-status="completed" aria-pressed="false"><i class="swatch" aria-hidden="true"></i> Completed</button>
+    <button type="button" data-progress-filter="blocked" data-status="blocked" aria-pressed="false"><i class="swatch" aria-hidden="true"></i> Blocked</button>
+    <p class="progress-filter-empty" role="status" hidden>No tasks match this filter.</p>
   </div>
-  <p class="context">Read-only status, updated by the agent from task records. Open Markdown links in your editor or repository viewer.</p>
+  <p class="context">Read-only status. Select a status to filter tasks; All restores the list. Example links stay on this page.</p>
   <ul class="tasks">
     <!-- Keep each ID stable. Change data-status, not checked attributes or browser storage. -->
     <li class="task" id="example-outline" data-status="not-started">
-      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Draft outline status"><div><a href="task/example-outline.md">Draft outline</a><span class="status"></span></div></div>
-      <details><summary>Agent notes</summary><p>Priority: next. Begin after the current review. The linked task is a placeholder to replace when copying this template.</p></details>
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Draft outline status"><div><a href="#example-outline">Example: draft outline</a><span class="status"></span></div></div>
+      <details><summary>Agent notes</summary><p>Next: write a short outline.</p></details>
     </li>
     <li class="task" id="example-review" data-status="in-progress">
-      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Review draft status"><div><a href="task/example-review.md">Review draft</a><span class="status"></span></div></div>
-      <details><summary>Agent notes</summary><p>Owner: review worker. Evidence review is advancing. Next: record findings and verify corrections.</p></details>
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Review draft status"><div><a href="#example-review">Example: review draft</a><span class="status"></span></div></div>
+      <details><summary>Agent notes</summary><p>Review is underway. Next: record findings.</p></details>
     </li>
     <li class="task" id="example-research" data-status="completed">
-      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Research options status"><div><a href="task/example-research.md">Research options</a><span class="status"></span></div></div>
-      <details><summary>Agent notes</summary><p>Requested research was reviewed against its completion criteria. Findings and limitations belong in the canonical record.</p></details>
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Research options status"><div><a href="#example-research">Example: research options</a><span class="status"></span></div></div>
+      <details><summary>Agent notes</summary><p>Findings checked against the requested criteria.</p></details>
     </li>
-    <li class="task" id="example-access" data-status="blocked">
-      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Verify access status"><div><a href="task/example-access.md">Verify access</a><span class="status"></span></div></div>
-      <p class="blocker">Blocked: the required account owner has not granted access. Next: verify access when that dependency changes.</p>
-      <details><summary>Agent notes</summary><p>Prepared work is retained. No duplicate request or unauthorized action is implied by this status.</p></details>
+    <li class="task" id="example-input" data-status="blocked">
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Verify sample status"><div><a href="#example-input">Example: verify sample</a><span class="status"></span></div></div>
+      <p class="blocker">Blocked: sample input is missing. Next: obtain the input and resume verification.</p>
+      <details><summary>Agent notes</summary><p>Prepared checks are ready for the sample input.</p></details>
     </li>
   </ul>
-  <details class="history"><summary>History and context</summary><p>Keep prior outcomes, evidence and useful detail here or in linked Markdown artifacts. Preserve an existing main note byte-for-byte before migration.</p></details>
-  <noscript><p>JavaScript is disabled. Colors and labels still show source status; native indeterminate properties require JavaScript. Consult the linked task records.</p></noscript>
+  <noscript><p>JavaScript is disabled. Colors and labels still show source status; native indeterminate properties require JavaScript. Filtering requires JavaScript.</p></noscript>
   <script>
     // data-status is authoritative; controls are a read-only projection, never an editor.
     const labels = { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Completed', blocked: 'Blocked' };
@@ -88,6 +92,32 @@
       label.classList.add('ready');
       box.setAttribute('aria-label', `${row.querySelector('a').textContent}: ${label.textContent}`);
     }
+  </script>
+  <script>
+    (() => {
+      const controls = document.getElementById('progress-filter');
+      const buttons = controls.querySelectorAll('button[data-progress-filter]');
+      const empty = controls.querySelector('.progress-filter-empty');
+
+      function filterTasks(selected) {
+        let matches = 0;
+        for (const row of document.querySelectorAll('.tasks > .task')) {
+          const visible = selected === 'all' || row.dataset.status === selected;
+          row.classList.toggle('progress-filter-hidden', !visible);
+          if (visible) matches += 1;
+        }
+        for (const button of buttons) {
+          button.setAttribute('aria-pressed', String(button.dataset.progressFilter === selected));
+        }
+        empty.hidden = matches !== 0;
+      }
+
+      for (const button of buttons) {
+        button.addEventListener('click', () => filterTasks(button.dataset.progressFilter));
+      }
+      filterTasks('all');
+      controls.hidden = false;
+    })();
   </script>
 </body>
 </html>

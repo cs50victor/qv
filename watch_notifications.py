@@ -9,9 +9,12 @@ from dataclasses import dataclass
 from datetime import date
 import math
 from pathlib import Path
+import sqlite3
 import subprocess
 import sys
 import time
+
+import notification_inbox
 
 
 MARKER_NAME = ".notifications-enqueued-lines"
@@ -94,13 +97,51 @@ def check_notifications(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""Before starting:
+  Inspect existing watchers. Run at most one total, owned by the coordinator;
+  never stop or retarget another thread's watcher. Verify the current thread
+  from CODEX_THREAD_ID in its native shell (not a worker or CODEX_SESSION_ID)
+  and its owning endpoint from connection metadata. Missing or conflicting
+  identity blocks launch; review notices directly instead.
+  Use codex queue --help for queue syntax. Workers must not start watchers.
+
+Worker notice contract:
+  Append to DAILY_ROOT/YYYY/MM/DD/notifications.md using the local completion
+  date. Include a unique completion ID, task ID, timestamp with timezone offset,
+  observed outcome and report links in one unchecked Markdown checklist entry.
+  Return the actual notice path and timestamp to the coordinator.
+  Producers and reviewers must open the sibling .notifications.lock in append
+  mode and hold fcntl.flock(handle, fcntl.LOCK_EX) while rereading, deduplicating
+  completion IDs and appending or checking a notice. Never replace or unlink
+  the lock. Preserve other entries; check a notice only after evidence review.
+
+Polling behavior:
+  Queue a file pointer when today's notice line count changes. Same-count edits
+  stay quiet. .notifications-enqueued-lines records queue acceptance, not review
+  or delivery. Queue failures leave it unchanged; marker-save failures can cause
+  duplicate wake-ups. Review errors before repairing a marker; do not reset it
+  blindly. The foreground loop ends on interruption; it installs no service.
+
+Optional captured-history wake-ups:
+  Initialize state using notification_inbox.py --help. --thread must then be
+  its owner UUID, --remote must match its saved server ('default' when omitted),
+  and state must exclude verified own-app bundle IDs. Use this existing watcher
+  or one owned heartbeat, never both. Accepted inbox pointers suppress repeated
+  wake-ups; only notification_inbox.py ack records review. Neither path changes
+  source messages. This script does not collect macOS notifications or prove
+  capture works under DND; check the collector separately.
+""")
     parser.add_argument("--thread", required=True, help="Coordinator thread ID or exact name")
     parser.add_argument("--remote", help="Owning Codex server endpoint, e.g. unix:///path/socket")
     parser.add_argument("--daily-root", type=Path, default=Path("~/daily"),
                         help="Daily records root (default: ~/daily)")
     parser.add_argument("--interval", type=float, default=5,
                         help="Seconds to sleep after each check (default: 5)")
+    parser.add_argument("--notification-state", type=Path,
+                        help="Opt-in private captured-history inbox, bound to this thread/server")
     args = parser.parse_args()
     if not args.thread.strip():
         parser.error("--thread must not be empty")
@@ -118,6 +159,15 @@ def main() -> int:
                 elif result.queue_exit_code == 0:
                     print(f"Enqueued file notice: {result.line_count} lines; queue exit 0 "
                           "(acceptance only)", flush=True)
+            if args.notification_state is not None:
+                try:
+                    message = notification_inbox.wake_inbox(
+                        args.notification_state, args.thread, args.remote)
+                except (OSError, ValueError, sqlite3.Error, KeyError, TypeError) as exc:
+                    print(f"Notification inbox check failed: {exc}", file=sys.stderr, flush=True)
+                else:
+                    if message:
+                        print(message, flush=True)
             time.sleep(args.interval)
     except KeyboardInterrupt:
         return 0
