@@ -35,6 +35,21 @@ to delegate execution, track dependencies and worker IDs in `~/.daily`, verify
 results, and report status by goal without requiring worker-session switching.
 This behavior is prompt-driven; the script does not implement a separate scheduler.
 
+The shared prompt keeps chat brief and uses visual artifacts for substantive
+explanations: diagrams, drawings, interactive HTML, and Manim videos when motion
+helps or a video is requested. Artifacts and editable sources live under
+`~/.daily/artifacts/<task-id>/`, linked from the existing task record. Simple
+answers stay in chat; important blockers remain visible. Voice gives a short
+spoken outcome while Codex produces the artifact. Rendering and previews depend
+on the installed tools and interface; the prompt reports unverified results.
+
+[`AGENTS.md`](AGENTS.md) contains the complete global instructions, including the
+visual-response preference, ready to copy and paste into `~/.codex/AGENTS.md`.
+If that path is a symlink, the change also applies wherever its target is used.
+Start a new conversation to verify the guidance is loaded. An
+`~/.codex/AGENTS.override.md` takes precedence over `AGENTS.md`. qv's coordinator
+and `~/.daily` task-tracking rules remain in `prompt.txt`.
+
 ## Switch between voice and CLI
 
 1. Stop voice with Ctrl+C. Copy the ID printed as `Codex: <thread-id>`, or read

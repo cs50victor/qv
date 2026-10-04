@@ -318,7 +318,8 @@ def resume_text(prompt):
     instructions = prompt + (
         "\nCurrent interface: Codex CLI text mode. The user is typing directly to you; "
         "no voice session, microphone, audio output, or GPT Live relay is connected. "
-        "Respond directly in written Markdown, with code and detail when useful. "
+        "Respond directly in brief written Markdown; deliver substantive explanations "
+        "as visual artifacts with direct links according to the shared prompt. "
         "Do not behave as a speech backend, wait for voice delegation, or claim to "
         "hear or speak. Earlier voice-mode instructions describe the previous interface, "
         "not this one. Continue as the same Astra orchestrator with the same goals, "
