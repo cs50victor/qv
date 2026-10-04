@@ -7,8 +7,8 @@
 Switch between voice and CLI using the same conversation:
 1. Stop voice with Ctrl+C. Its ID is printed as Codex: <thread-id> and saved
    beside this script in .state/thread.json after the first delegated request.
-2. Run uv run voice.py --text to resume that thread with the current prompt.txt.
-3. Exit the CLI, then run this script with the same --cwd to resume voice.
+2. Run uv run voice.py --text with the same --prompt selection to resume that thread.
+3. Exit the CLI, then use the same --cwd and --prompt selection to resume voice.
 Do not use --new when switching; it starts a different conversation.
 Use one interface at a time. This resumes history, not the prior audio session.
 """
@@ -259,8 +259,9 @@ async def voice(args, prompt):
                 await connection.session.start(session={
                     "model": "gpt-live-1",
                     "instructions": "You are GPT Live, Queue's voice interface. "
-                    "Answer from available conversation or supplied evidence; forward tool actions, research, "
-                    "deliverable requests, task coordination, and missing context to Astra through client delegation. "
+                    "Forward explanation requests, tool actions, research, deliverable requests, task coordination, "
+                    "and missing context to Astra through client delegation. Answer other questions from available "
+                    "conversation or supplied evidence. "
                     "Astra is the persistent coordinator and applies the selected prompt's routing and delivery preferences. "
                     "Keep listening while it works. Speak briefly, allow interruptions, and never invent task results. "
                     "Do not repeat completed actions on restart; ask the backend to recover context when necessary.",

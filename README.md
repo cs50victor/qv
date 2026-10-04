@@ -1,12 +1,14 @@
 # Queue Voice
 
-One `uv` script and an editable `prompt.txt`: GPT Live (`gpt-live-1`, Marin) handles
-voice; Astra (`gpt-6-astra`) coordinates through Codex and delegates research and
+The voice script uses GPT Live (`gpt-live-1`, Marin) for audio and Astra
+(`gpt-6-astra`) as the persistent Codex coordinator. Astra delegates research and
 deliverable work to independent Codex CLI workers in detached tmux sessions.
-No desktop app, Rust build, or custom MCP server.
+A separate script watches completion notices.
 
-Requires `uv`, `tmux`, Codex CLI 0.151+ with a signed-in account, an OpenAI API key with
-GPT Live access, and a microphone. Use headphones.
+Requires `uv`, `tmux`, a signed-in Codex CLI, an OpenAI API key with GPT Live access,
+and a microphone. Use headphones. Watcher setup requires `CODEX_THREAD_ID` in the
+coordinator's native shell and `codex queue` with `--thread`, `--message` and, when
+needed, `--remote` in its launch environment.
 
 ```sh
 export OPENAI_API_KEY="your-key"
@@ -15,12 +17,14 @@ uv run voice.py --cwd /path/to/project
 
 Alternatively put `OPENAI_API_KEY=...` in `.env` beside the script. A missing/empty
 key exits with status 1 before creating a client or opening audio. Codex uses its
-existing authentication. The script retains Queue's full-access/no-approval mode.
+existing authentication. Voice mode uses full filesystem access with no approval
+prompts; CLI text mode uses its own configuration.
 
 The default coordinator prompt is `prompt.txt`; `--prompt /path/to/file` selects
 another coordinator prompt. Edit the selected file and restart to apply changes.
-GPT Live receives voice-interface instructions and forwards tool actions and
-research to Astra. Ctrl+C closes voice and the SDK.
+GPT Live receives separate voice-interface instructions and forwards explanation
+requests, tool actions, research, deliverables and coordination to Astra. Ctrl+C
+closes voice and the SDK.
 The Codex conversation ID is saved in ignored `.state/thread.json`; subsequent
 runs resume it. `--new` starts a fresh conversation without deleting Codex history.
 Do not run two copies against the same state file. The script does not manage
@@ -33,47 +37,61 @@ seconds. API access and Codex authentication are separate requirements.
 `~/.daily` is created by the agent only when work needs recording. Daily notes stay
 at `~/.daily/YYYY/MM/DD.md`; completion notices use checkboxes in
 `~/.daily/YYYY/MM/DD/notifications.md`, dated by local notification/completion time.
-Workers may append assigned notices with completion/task IDs, timestamps, observed
-outcomes, and result links; canonical records remain yours. On receipt/read, you
-review notices, verify results, and record follow-up scope before proactively
-assigning needed authorized investigation, validation, and reversible follow-through
-to the responsible worker in its existing session. Continue authorized dependent
-work once prerequisites are verified, without waiting for a status request.
-Check off handled notices after recording outcomes and follow-through; checked
-does not mean the goal or downstream actions are complete. Older unresolved notices
-carry forward by link and are reviewed on resume/status.
+Workers append assigned notices with task and completion IDs, timestamps,
+observed outcomes and result links, and return the actual completion-date notice
+path in workspace results or captured output. The coordinator owns canonical
+records and updates their links to that path during reconciliation. Subject to
+the standalone-answer and only-command exceptions below, it reviews notices on
+receipt or read in the indicated file, the current day's file and linked older
+files. It verifies results and records follow-up scope before assigning necessary
+authorized investigation, validation and reversible follow-through to the
+responsible worker's existing session. Dependent work proceeds after prerequisite
+verification, without waiting for a status request. Notices are checked off after
+outcomes and follow-through are recorded; checked means handled, including failure
+or blockage, not goal completion. Unresolved older notices stay linked for recovery.
 
-When an action needs authorization, have workers finish authorized research and
-prepare the reviewable draft/recipient/channel/supporting facts or payload/target
-and evidence first. Only that action waits; valid existing authorization carries
-forward. Sending a message requires explicit authorization. Keep verified findings,
-prepared actions, completed steps, remaining decisions/authorization, blockers,
-and next actions in records/artifacts; describe outstanding research honestly and
-link details from brief status replies.
+Before asking for authorization, the coordinator has workers finish authorized
+research and prepare the exact message draft, recipient, channel and supporting
+facts, or the external action payload, target and evidence. Sending messages
+requires explicit authorization. Existing authorization carries forward; only
+the action awaiting approval pauses. The coordinator keeps findings, prepared
+actions, remaining decisions, blockers and next actions in linked records and
+reports status by goal.
 
 Notice production and wake-up delivery are separate. With the standalone watcher
 active, workers append notices and do not also enqueue them. The watcher sends only
 `Check notifications file: <absolute notice path under the resolved daily root>`;
 details stay in the file. The watcher resolves the root, then constructs
-`YYYY/MM/DD/notifications.md`; it does not resolve day/file symlinks. Journal sync
-and automatic voice announcements are not implemented.
+`YYYY/MM/DD/notifications.md`; it does not resolve day or file symlinks in the
+pointer. Journal sync and automatic voice announcements are not implemented.
 
 ### Notification watcher
 
-From your coordinator's own native shell tool, validate `CODEX_THREAD_ID` as a UUID
-and compare verified current-thread metadata when available. Missing, malformed, or
-conflicting identity blocks launch. Capture it before tmux; never substitute a worker
-ID, recent rollout, or session-tree-root `CODEX_SESSION_ID`. Obtain any required
-owning-server endpoint from the known connection and check `codex queue --help` in
-the actual launch environment.
+Before its first worker dispatch and on work recovery, the coordinator inspects
+all notification watchers. It reuses an owned watcher only if its daily root,
+thread and server match the current configuration verified below. An owned
+mismatch follows the retargeting rules below; unknown ownership blocks setup.
+It launches only if none exists and prerequisites pass. Greetings, standalone
+answers and only-command requests do not trigger setup. Blockers leave direct
+notice review in place while other authorized work continues.
 
-Record the watcher owner, resolved daily root/script, target, tmux target, and
-writable log path before launch. Use at most one notification watcher total in
-detached tmux, targeting your coordinator thread only. Workers append notices and
-never start watchers. This watcher owns the shared daily root; unknown existing
-ownership blocks another. After these checks, replace the checkout
-and log paths below. The shell guard checks absence only; UUID and metadata
-validation are preceding coordinator steps, not implemented by this snippet:
+From the coordinator's own native shell tool, validate `CODEX_THREAD_ID` as a
+UUID and compare verified current-thread metadata when available. Missing,
+malformed, or conflicting identity blocks launch or reuse. Capture it before
+tmux; never substitute a worker ID, recent rollout, or session-tree-root
+`CODEX_SESSION_ID`. Obtain any required owning-server endpoint from known
+connection metadata, or verify a matching default connection; record the source.
+If neither can be established, block launch or reuse and review notices
+directly. A thread ID or accepted queue message is not server evidence. Check
+`codex queue --help` in the actual launch environment.
+
+Before launch, verify write access for logs and day markers; record the watcher
+owner, resolved daily root and script, thread and server target, tmux target,
+and log path. Use at most one notification watcher total in detached tmux,
+targeting only the coordinator thread. Workers append notices and never start
+watchers. After these checks, replace the checkout and log paths below. The
+shell guard checks absence only; UUID and metadata validation are preceding
+coordinator steps, not implemented by this snippet:
 
 ```sh
 coordinator_thread_id="${CODEX_THREAD_ID:?current coordinator tool ID is required}"
@@ -85,16 +103,18 @@ tmux new-session -d -s qv-notifications -c /path/to/qv \
 The detached shell receives the captured ID as an argument. For a remote owning
 server, add `--remote <owning-server-endpoint>` to the watcher command. qv prints SDK
 `thread.id` at startup and saves it in `.state/thread.json` after the first request;
-saved state must belong to the active invocation. CLI `/statusline` exposes
-`thread-id` (legacy alias `session-id`); remote CLI `/status` can display its
-connected address. These UI commands are separate from the model's shell-tool
-identity lookup. The watcher supports `--daily-root` (default `~/.daily`) and
+saved state must belong to the active invocation. Printed or saved SDK thread IDs
+do not identify the owning server: qv saves only the thread ID and working
+directory and supplies no SDK endpoint-discovery recipe. If verified connection
+metadata is unavailable, watcher setup remains blocked and the coordinator reviews
+notices directly. The watcher supports `--daily-root` (default `~/.daily`) and
 `--interval` (default 5 seconds).
 
 The watcher checks immediately, then waits five seconds after each check by
-default. Slow queue calls delay the next check. Each check follows the local date
-and reads that day's `notifications.md` line count. A missing file is normal. A
-changed count, or an existing file without a marker, causes
+default. Slow queue calls delay the next check; each queue call has a 30-second
+timeout. Each check follows the local date and reads that day's `notifications.md`
+line count. A missing file is normal. A changed count, or an existing file without
+a marker, causes
 `codex queue --thread ID --message <short-file-pointer>`, with
 `--remote` when supplied. The same day's `.notifications-enqueued-lines` persists
 the last successfully enqueued count, shared across targets, and advances only
@@ -106,24 +126,28 @@ edits do not ping. Resume/status review still handles unchecked or linked older
 notices even when their count has not changed.
 
 Queue exit 0 means acceptance, not consumption, evidence review, or task success.
-Use an eligible loaded coordinator on its owning server; a stopped/unloaded parent
-may not consume a pointer. Consumption does not establish a spoken announcement
-through the qv voice relay. `voice.py` does not install or start the watcher, and no
-Stop hook, hidden queue option, or API bridge is needed for it.
+Use an eligible loaded coordinator on its owning server; a stopped or unloaded
+coordinator may not consume a pointer. Consumption does not establish a spoken
+announcement through the qv voice relay. `voice.py` does not install or start
+the watcher.
 
-The user talks to one persistent coordinator throughout the day. Set daily goals,
-change priorities, or ask "Where are we on today's goals?" The prompt tells Astra
-to handle clock/date/timezone calls, available-evidence answers, and coordination
-directly; delegate acquiring new facts and creating or changing deliverables/code,
-including a one-source lookup. Explicit direction to act directly or run only a
-specified command overrides routing defaults. Astra records goals and planned
-launch metadata in `~/.daily` before dispatch, then observed IDs and actual results,
-reviews evidence, and reports status by goal without worker-session switching.
-This behavior is prompt-driven; the script does not implement a separate scheduler.
-Work requests are recorded before switching scope; work-status replies and work-turn
-reconciliation include earlier and deferred outcomes, including mixed answer/work
-turns. Standalone clocks and available-evidence answers need no new task or worker;
-only-command requests exclude unrelated record and worker actions.
+The user talks to one persistent coordinator: set goals, change priorities or ask
+for status without switching worker sessions. Both prompts have Astra handle
+clock, date and timezone questions, available-evidence answers, setup and evidence
+review directly. Acquiring new facts, validation and creating or changing code or
+deliverables go to workers, including one-source lookups. Daily visual-artifact
+requirements also apply to explanations based on available facts.
+
+Explicit direct-execution or no-delegation requests override routing defaults.
+Only-command requests exclude unrelated record, worker, watcher and notice
+actions even when a pointer arrives; pending notices stay unchecked for the next
+ordinary work turn. Standalone answers needing no artifact require no new task or
+worker. Mixed answer and work turns require intake and reconciliation.
+
+Astra records work on receipt before switching scope, records planned launch
+metadata before dispatch and adds observed IDs and results afterward. Status and
+end-of-work reconciliation cover earlier and deferred outcomes. This behavior is
+prompt-driven; the script does not implement a scheduler.
 
 ## Global preferences and daily coordinator
 
@@ -158,13 +182,14 @@ they load global development preferences and their target project's instructions
 They do not inherit the daily prompt or coordinator history through subagents,
 forks, resumes, or forwarded developer instructions.
 
-The coordinator maintains daily records and collects finished artifacts under
-`~/.daily/artifacts/<task-id>/`. Substantive explanations become diagrams,
-drawings, interactive HTML, or rendered Manim videos when motion helps; answers
-from available evidence and requested prose stay in chat. Preview support,
-steering, and worker lifetimes depend on the runtime and are verified rather than promised.
+The daily coordinator collects verified finished artifacts under
+`~/.daily/artifacts/<task-id>/`. Substantive explanations use useful visual artifacts
+unless the user requests prose or another format, even when the facts are already
+available. Standalone answers needing no artifact stay in chat. The default prompt
+does not require visuals. Preview support, steering and worker lifetimes depend on
+the runtime and must be verified.
 
-Both `prompt.txt` and the daily template use the same delegation routing. Select
+Both `prompt.txt` and the daily template use independent CLI workers. Select
 the daily coordinator prompt for its visual-delivery preferences:
 
 ```sh
@@ -173,29 +198,33 @@ uv run voice.py --text --prompt ~/.daily/AGENTS.md
 ```
 
 Use one interface at a time and the same `--prompt` selection when switching;
-omitting it selects `prompt.txt` in either interface. Both prompts keep daily
-records under your ownership; workers keep intermediate workspace outputs, with
-assigned notification appends and their directory and lock operations as the only
-exception. All producers and acknowledgers use the same persistent
+omitting it selects `prompt.txt` in either interface. The coordinator maintains
+daily records. Workers keep intermediate outputs in their workspace and may write
+to the daily area only for assigned notices and required directory and lock
+operations. All producers and acknowledgers use the same persistent
 `.notifications.lock` beside that day's `notifications.md`,
 opened in append mode and locked with Python standard-library
 `fcntl.flock(handle, fcntl.LOCK_EX)`. Hold the handle while rereading/editing notices
-and close it on completion or error; never unlink or replace the lock file. Worker
-permissions must cover assigned notice-directory/lock operations on the first day
-and at rollover. This is a prompt contract, with no installed locking helper.
+and close it on completion or error; never unlink or replace the lock file. Verify
+workers' authorized permissions cover notice appends and day-directory and lock
+creation on the first day and at rollover. If access fails, workers preserve
+workspace evidence and report the notice-write blocker. This is a prompt contract,
+with no installed locking helper.
 
 ## Switch between voice and CLI
 
 1. Stop voice with Ctrl+C. Copy the ID printed as `Codex: <thread-id>`, or read
    `.state/thread.json` beside `voice.py` after the first delegated request.
-2. Run `uv run voice.py --text` to continue the same conversation in Codex CLI.
+2. Run `uv run voice.py --text --prompt /path/to/selected-prompt` to continue the
+   same conversation, using the prompt selected for voice.
    This reads the saved thread ID and working directory and explicitly supplies
    the selected coordinator prompt (default `prompt.txt`), including daily task
    tracking. Text mode explicitly tells Astra there is no audio or GPT Live relay and to respond
    in written Markdown. It uses Codex authentication and does not require
    `OPENAI_API_KEY`.
-3. Exit the CLI, then run `uv run voice.py --cwd /path/to/project` with the same
-   working directory to resume voice from that conversation.
+3. Exit the CLI, then run
+   `uv run voice.py --cwd /path/to/project --prompt /path/to/selected-prompt`
+   with the same working directory and prompt to resume voice.
 
 Do not use `--new` when switching. Use one interface at a time. Conversation
 history resumes; the previous audio session does not.
