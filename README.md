@@ -72,6 +72,10 @@ the list, colors, notes and links usable if the CDN fails; the small local scrip
 sets indeterminate properties and labels independently of the CDN. Without
 JavaScript, CSS still shows status text and markers, and task links remain usable.
 
+The [captured notification review](docs/actionable-notifications.md)
+flow reads an existing archive and prepares actionable response drafts for review.
+Capture requires a separate collector; sending requires explicit authorization.
+
 Completion notices use checkboxes in
 `~/daily/YYYY/MM/DD/notifications.md`, dated by local notification/completion time.
 Workers append assigned notices with task and completion IDs, timestamps,
@@ -96,12 +100,16 @@ actions, remaining decisions, blockers and next actions in linked records and
 reports status by goal.
 
 Notice production and wake-up delivery are separate. With the standalone watcher
-active, workers append notices and do not also enqueue them. The watcher sends only
+active, workers append notices and do not also enqueue them. By default, the watcher
+sends only completion-file pointers:
 `Check notifications file: <absolute notice path under the resolved daily root>`;
 details stay in the file. The watcher resolves the root, then constructs
 `YYYY/MM/DD/notifications.md`; it does not resolve day or file symlinks in the
 pointer. The scripts do not implement journal sync or automatic voice
 announcements; the daily prompt directs the coordinator to back up records.
+With the opt-in `--notification-state` option, that same watcher also queues private
+archive-inbox pointers after checking completion notices. See the
+[capture setup and ownership requirements](docs/actionable-notifications.md).
 
 ### Notification watcher
 
