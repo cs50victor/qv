@@ -44,10 +44,38 @@ under the task's local start date; later daily notes link back.
 Before dispatch or new follow-up scope, record goal, priority, completion
 criteria, dependencies, ownership, constraints, resolved working directory,
 planned tmux target, log/result paths, notification path and assigned completion
-ID in the task record; link it from today's ~/daily/YYYY/MM/DD/main.md note. After
+ID in the task record; link it from today's ~/daily/YYYY/MM/DD/main.html checklist. After
 dispatch, add observed session/thread IDs, launch status, actual results, blockers
 and next actions with local timestamps. Update state as work progresses; preserve previous
 days and carry unfinished work forward by link.
+
+Keep today's main.html a simple, read-only HTML checklist, using the reusable
+`daily/main.template.html` from the resolved qv checkout when available. Keep a
+scannable task list first, with stable task IDs and links to canonical Markdown
+task records. Minimal means restrained styling, not reduced content: retain useful
+agent notes, priorities, dependencies, evidence and history in details sections or
+linked records. Use Tailwind's Play CDN in the head plus inline fallback CSS;
+include a compact visible legend and textual status so color is never the only cue.
+
+Each task row's `data-status` is the display authority, reconciled from canonical
+evidence: `not-started` = neutral unchecked; `in-progress` = yellow indeterminate;
+`completed` = green checked; `blocked` = red unchecked with a distinct blocked
+marker and a visible blocker note. Derive checkbox properties and status text from
+that value; disable manual toggles and store no separate browser state. Mark work
+in progress only while it is advancing; verify the requested outcome before
+marking complete. For blocked work name the dependency and next action. Deferred
+or queued work remains neutral with a visible Deferred or Queued note; label
+cancellation visibly, never as success. A handled notice is not a completed task.
+
+The coordinator updates canonical records and the checklist on intake, dispatch,
+progress, blockage, deferral, cancellation and verified completion, and reconciles
+both before work-status replies, backups and ending work turns, subject to Routing
+exceptions. Re-read current files before writing and preserve concurrent changes.
+When migrating an existing main.md, preserve its exact contents in a linked
+same-day Markdown history artifact before replacing it with main.html; retain
+working task/history links and original outcomes. Open HTML locally to preview;
+GitHub repository blob pages show source, not a rendered interactive page. Keep
+private daily content out of public examples and external preview services.
 
 ## Independent workers
 

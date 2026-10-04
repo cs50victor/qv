@@ -35,10 +35,40 @@ access; it opens a billable session. `--duration 30` limits a voice session to 3
 seconds. API access and Codex authentication are separate requirements.
 
 `~/daily` is created by the agent only when work needs recording. Daily notes use
-`~/daily/YYYY/MM/DD/main.md`. Each task has one canonical record at
+`~/daily/YYYY/MM/DD/main.html`. Each task has one canonical record at
 `~/daily/YYYY/MM/DD/task/<task-id>.md` and artifacts under
 `~/daily/YYYY/MM/DD/artifacts/<task-id>/`. Both stay under the task's local
 start date; later daily notes link back.
+
+Use [daily/main.template.html](daily/main.template.html) as a standalone starting
+point. It has synthetic examples of all four agent-updated states: neutral
+unchecked (not started), yellow indeterminate (in progress), green checked
+(completed), and red unchecked with a blocked marker and visible reason (blocked).
+Each row has a stable task ID and authoritative `data-status`; JavaScript derives
+native checkbox properties and readable labels. The display is read-only, with no
+browser storage or manual task mutation. Deferred work stays neutral with a note.
+Keep useful notes, priorities, dependencies and history in expandable details or
+linked canonical Markdown records, with the checklist visible first.
+
+Both coordinator prompts require synchronization at lifecycle changes and before
+status replies, backups and turn end, preserving routing and notice exceptions.
+For an existing main.md, first save its exact bytes as a same-day history artifact,
+link it from main.html, and verify task/history links before retiring the old main.
+Re-read before replacement so concurrent edits survive. This repository supplies
+instructions and a template, not a migration service or a persistence backend.
+
+Open local HTML in a browser. GitHub repository blob pages display HTML source;
+private repository authentication also prevents anonymous preview services from
+being a suitable viewer. Do not deploy private daily pages to GitHub Pages or send
+them to external renderers. Markdown task links remain ordinary file/repository
+links, not an embedded Markdown viewer.
+
+The template loads the [Tailwind v4 Play CDN](https://tailwindcss.com/docs/installation/play-cdn),
+which Tailwind documents for development, not production hosting. Inline CSS keeps
+the list, colors, notes and links usable if the CDN fails; the small local script
+sets indeterminate properties and labels independently of the CDN. Without
+JavaScript, CSS still shows status text and markers, and task links remain usable.
+
 Completion notices use checkboxes in
 `~/daily/YYYY/MM/DD/notifications.md`, dated by local notification/completion time.
 Workers append assigned notices with task and completion IDs, timestamps,
