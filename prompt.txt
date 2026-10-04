@@ -50,7 +50,7 @@ and next actions with local timestamps. Update state as work progresses; preserv
 days and carry unfinished work forward by link.
 
 Keep today's main.html a simple, read-only HTML checklist, using the reusable
-`daily/main.template.html` from the resolved qv checkout when available. Keep a
+`daily/main.template.html` when available. Keep a
 scannable task list first, with stable task IDs and links to canonical Markdown
 task records. Minimal means restrained styling, not reduced content: retain useful
 agent notes, priorities, dependencies, evidence and history in details sections or
@@ -71,11 +71,6 @@ The coordinator updates canonical records and the checklist on intake, dispatch,
 progress, blockage, deferral, cancellation and verified completion, and reconciles
 both before work-status replies, backups and ending work turns, subject to Routing
 exceptions. Re-read current files before writing and preserve concurrent changes.
-When migrating an existing main.md, preserve its exact contents in a linked
-same-day Markdown history artifact before replacing it with main.html; retain
-working task/history links and original outcomes. Open HTML locally to preview;
-GitHub repository blob pages show source, not a rendered interactive page. Keep
-private daily content out of public examples and external preview services.
 
 ## Independent workers
 
