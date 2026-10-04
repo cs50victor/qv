@@ -34,13 +34,13 @@ tmux worker lifetimes or promise work continues after exit.
 access; it opens a billable session. `--duration 30` limits a voice session to 30
 seconds. API access and Codex authentication are separate requirements.
 
-`~/.daily` is created by the agent only when work needs recording. Daily notes use
-`~/.daily/YYYY/MM/DD/main.md`. Each task has one canonical record at
-`~/.daily/YYYY/MM/DD/task/<task-id>.md` and artifacts under
-`~/.daily/YYYY/MM/DD/artifacts/<task-id>/`. Both stay under the task's local
+`~/daily` is created by the agent only when work needs recording. Daily notes use
+`~/daily/YYYY/MM/DD/main.md`. Each task has one canonical record at
+`~/daily/YYYY/MM/DD/task/<task-id>.md` and artifacts under
+`~/daily/YYYY/MM/DD/artifacts/<task-id>/`. Both stay under the task's local
 start date; later daily notes link back.
 Completion notices use checkboxes in
-`~/.daily/YYYY/MM/DD/notifications.md`, dated by local notification/completion time.
+`~/daily/YYYY/MM/DD/notifications.md`, dated by local notification/completion time.
 Workers append assigned notices with task and completion IDs, timestamps,
 observed outcomes and result links, and return the actual completion-date notice
 path in workspace results or captured output. The coordinator owns canonical
@@ -111,7 +111,7 @@ saved state must belong to the active invocation. Printed or saved SDK thread ID
 do not identify the owning server: qv saves only the thread ID and working
 directory and supplies no SDK endpoint-discovery recipe. If verified connection
 metadata is unavailable, watcher setup remains blocked and the coordinator reviews
-notices directly. The watcher supports `--daily-root` (default `~/.daily`) and
+notices directly. The watcher supports `--daily-root` (default `~/daily`) and
 `--interval` (default 5 seconds).
 
 The watcher checks immediately, then waits five seconds after each check by
@@ -161,33 +161,37 @@ kept below the repository root to avoid loading daily rules for qv workers:
 | File | Install at | Applies to |
 | --- | --- | --- |
 | [global/AGENTS.md](global/AGENTS.md) | `~/.codex/AGENTS.md` | Development preferences in every project |
-| [daily/AGENTS.md](daily/AGENTS.md) | `~/.daily/AGENTS.md` | Daily orchestration, visual artifacts, and brief chat |
+| [daily/AGENTS.md](daily/AGENTS.md) | `~/daily/AGENTS.md` | Daily orchestration, visual artifacts, and brief chat |
 
 Review existing destination files before replacing them, preserving any local
 rules you need. If the global path is a symlink, writing through it also updates
 its shared target. From this checkout:
 
 ```sh
-mkdir -p ~/.codex ~/.daily
+mkdir -p ~/.codex ~/daily
 cp global/AGENTS.md ~/.codex/AGENTS.md
-cp daily/AGENTS.md ~/.daily/AGENTS.md
-codex --cd ~/.daily
+cp daily/AGENTS.md ~/daily/AGENTS.md
+codex --cd ~/daily
 ```
 
-In the Codex app, select `~/.daily` as the coordinator's project directory and
+In the Codex app, select `~/daily` as the coordinator's project directory and
 start a new conversation to load the files. Codex layers global and project
 instructions; without a detected project root it checks only the current
-directory, so start at `~/.daily` rather than assuming a nested folder inherits it.
+directory, so start at `~/daily` rather than assuming a nested folder inherits it.
 
 The coordinator starts fresh Codex CLI processes in detached tmux sessions, with
 both tmux and Codex working in the target project or its isolated workspace.
-Workers never start in `~/.daily` or its descendants, including symlink aliases;
+Workers never start in `~/daily` or its descendants, including symlink aliases;
 they load global development preferences and their target project's instructions.
+On installations migrated from the former `~/.daily` location, keep that path as
+a compatibility symlink to `~/daily`, never a second writable copy. Existing links
+and workers then reach the same records and persistent notification locks; the
+worker-directory exclusion applies through that alias too.
 They do not inherit the daily prompt or coordinator history through subagents,
 forks, resumes, or forwarded developer instructions.
 
 The daily coordinator collects verified finished artifacts under
-`~/.daily/YYYY/MM/DD/artifacts/<task-id>/` under the task's start date.
+`~/daily/YYYY/MM/DD/artifacts/<task-id>/` under the task's start date.
 Substantive explanations use useful visual artifacts
 unless the user requests prose or another format, even when the facts are already
 available. Standalone answers needing no artifact stay in chat. The default prompt
@@ -198,8 +202,8 @@ Both `prompt.txt` and the daily template use independent CLI workers. Select
 the daily coordinator prompt for its visual-delivery preferences:
 
 ```sh
-uv run voice.py --cwd ~/.daily --prompt ~/.daily/AGENTS.md
-uv run voice.py --text --prompt ~/.daily/AGENTS.md
+uv run voice.py --cwd ~/daily --prompt ~/daily/AGENTS.md
+uv run voice.py --text --prompt ~/daily/AGENTS.md
 ```
 
 Use one interface at a time and the same `--prompt` selection when switching;

@@ -97,8 +97,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--thread", required=True, help="Coordinator thread ID or exact name")
     parser.add_argument("--remote", help="Owning Codex server endpoint, e.g. unix:///path/socket")
-    parser.add_argument("--daily-root", type=Path, default=Path("~/.daily"),
-                        help="Daily records root (default: ~/.daily)")
+    parser.add_argument("--daily-root", type=Path, default=Path("~/daily"),
+                        help="Daily records root (default: ~/daily)")
     parser.add_argument("--interval", type=float, default=5,
                         help="Seconds to sleep after each check (default: 5)")
     args = parser.parse_args()
