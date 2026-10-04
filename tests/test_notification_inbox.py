@@ -89,6 +89,41 @@ class InboxTests(unittest.TestCase):
         self.init(excluded_apps=["example.orchestrator"])
         self.assertEqual([r["uuid"] for r in self.read()["items"]], ["undated", "new"])
 
+    def test_unpadded_cli_cutoff_keeps_inclusive_boundary_and_later_captures(self):
+        self.add("before", recorded="2026-02-03 04:05:05")
+        self.add("exact", recorded="2026-02-03 04:05:06")
+        self.add("after", recorded="2026-02-03 04:05:07")
+        self.add("later-month", recorded="2026-10-01 00:00:00")
+        cutoffs = [
+            "2026-02-03 04:05:06",
+            "2026-2-03 04:05:06",
+            "2026-02-3 04:05:06",
+            "2026-02-03 4:05:06",
+            "2026-02-03 04:5:06",
+            "2026-02-03 04:05:6",
+            "2026-2-3 4:5:6",
+        ]
+        for index, since in enumerate(cutoffs):
+            with self.subTest(since=since):
+                self.state = self.state.with_name(f"boundary-{index}.sqlite3")
+                result = subprocess.run([
+                    sys.executable, inbox.__file__, "--state", str(self.state), "--owner", OWNER,
+                    "init", "--history", str(self.history), "--since", since,
+                ], capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual([r["uuid"] for r in self.read()["items"]],
+                                 ["exact", "after", "later-month"])
+                with sqlite3.connect(self.state) as db:
+                    config = json.loads(db.execute("SELECT value FROM config").fetchone()[0])
+                self.assertEqual(config["since"], "2026-02-03 04:05:06")
+
+    def test_invalid_calendar_cutoff_fails_before_creating_state(self):
+        for since in ["2026-02-30 04:05:06", "2026-02-03 24:05:06", "not a timestamp"]:
+            with self.subTest(since=since):
+                with self.assertRaises(ValueError):
+                    inbox.initialize(self.state, self.history, OWNER, None, since, [])
+                self.assertFalse(self.state.exists())
+
     def test_receipts_require_presented_ids_and_durable_handoff_and_are_idempotent(self):
         self.add()
         self.init()

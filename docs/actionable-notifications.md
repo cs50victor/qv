@@ -38,10 +38,12 @@ state cannot enqueue CLI wake-ups. For CLI mode include the verified endpoint or
 `default` only for a verified default server, plus `--exclude-app` entries for the
 verified apps emitting the coordinator's own notifications.
 Choose the capture time floor explicitly so startup history is not mistaken for
-new arrivals. The floor is inclusive on `recorded_at`; undated rows remain eligible
-and require age verification. Use a dedicated private directory outside every
-Git worktree, including private daily repositories. Initialization refuses an
-existing state file and cannot reset or transfer ownership.
+new arrivals. Accepted `--since` values are stored as zero-padded
+`YYYY-MM-DD HH:MM:SS` for chronological text comparison. The floor is inclusive on
+`recorded_at`; undated rows remain eligible and require age verification.
+Use a dedicated private directory outside every Git worktree, including private
+daily repositories. Initialization refuses an existing state file and cannot reset
+or transfer ownership.
 
 ```sh
 uv run notification_inbox.py --owner <coordinator-uuid> init \

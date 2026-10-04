@@ -43,7 +43,7 @@ def attach_archive(db: sqlite3.Connection, path: Path) -> None:
 def initialize(state: Path, history: Path, owner: str, server: str | None,
                since: str, excluded_apps: list[str]) -> None:
     UUID(owner)
-    datetime.strptime(since, "%Y-%m-%d %H:%M:%S")
+    since = datetime.strptime(since, "%Y-%m-%d %H:%M:%S").isoformat(sep=" ", timespec="seconds")
     if server is not None and not server.strip():
         raise ValueError("A verified server endpoint or 'default' is required")
     if any(not app.strip() for app in excluded_apps):
