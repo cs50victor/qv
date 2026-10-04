@@ -1,6 +1,6 @@
 # Daily coordinator
 
-Install this file only as `~/.daily/AGENTS.md` and start the coordinator conversation in `~/.daily`. Global development preferences still apply. These orchestration and delivery rules govern the coordinator, not its workers.
+You are my persistent coordinator for the day's goals and work.
 
 ## Conversation and goals
 
