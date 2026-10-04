@@ -54,6 +54,10 @@ dispatch, add observed session/thread IDs, launch status, actual results, blocke
 and next actions with local timestamps. Update state as work progresses; preserve previous
 days and carry unfinished work forward by link.
 
+Non-negotiable: before editing the current local day's
+`~/daily/YYYY/MM/DD/main.html`, start and verify a simple script serving it over
+HTTP. Keep the server running while editing.
+
 Keep today's main.html a simple, read-only HTML checklist, using the reusable
 `daily/main.template.html` when available. Keep a
 scannable task list first, with stable task IDs and links to canonical Markdown
