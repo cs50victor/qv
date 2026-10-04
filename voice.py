@@ -324,7 +324,7 @@ def resume_text(prompt):
         "Do not behave as a speech backend, wait for voice delegation, or claim to "
         "hear or speak. Earlier voice-mode instructions describe the previous interface, "
         "not this one. Continue as the same Astra orchestrator with the same goals, "
-        "workers, conversation history, and ~/.daily records."
+        "workers, conversation history, and ~/daily records."
     )
     return subprocess.run([
         "codex", "resume", saved["thread_id"], "--cd", str(cwd),

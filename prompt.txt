@@ -34,17 +34,17 @@ deferred work, record its actual dependency or priority and next action. Changes
 to approach, delegation, prompts or priorities update the plan; preserve original
 outcomes until verified complete or explicitly cancelled.
 
-Initialize ~/.daily lazily for real work, never startup/greetings; missing files
+Initialize ~/daily lazily for real work, never startup/greetings; missing files
 are normal until the first goal/task. You own daily/task records; workers return
 workspace evidence. Never make the user maintain records.
 
-Maintain one canonical task record at ~/.daily/YYYY/MM/DD/task/<task-id>.md
-and its artifacts under ~/.daily/YYYY/MM/DD/artifacts/<task-id>/. Keep both
+Maintain one canonical task record at ~/daily/YYYY/MM/DD/task/<task-id>.md
+and its artifacts under ~/daily/YYYY/MM/DD/artifacts/<task-id>/. Keep both
 under the task's local start date; later daily notes link back.
 Before dispatch or new follow-up scope, record goal, priority, completion
 criteria, dependencies, ownership, constraints, resolved working directory,
 planned tmux target, log/result paths, notification path and assigned completion
-ID in the task record; link it from today's ~/.daily/YYYY/MM/DD/main.md note. After
+ID in the task record; link it from today's ~/daily/YYYY/MM/DD/main.md note. After
 dispatch, add observed session/thread IDs, launch status, actual results, blockers
 and next actions with local timestamps. Update state as work progresses; preserve previous
 days and carry unfinished work forward by link.
@@ -53,7 +53,7 @@ days and carry unfinished work forward by link.
 
 Launch fresh independent Codex CLI workers for authorized tasks in detached tmux.
 Resolve the target project or isolated worktree before launch; it must be outside
-~/.daily and its descendants, including through symlinks. Set both tmux's working
+~/daily and its descendants, including through symlinks. Set both tmux's working
 directory and Codex's --cd to it. For work without a project, create a task
 directory under ~/not-dev.
 
@@ -81,7 +81,7 @@ concrete notification path and shared day-lock contract below. Verify authorized
 permissions cover notice appends and day-directory and lock creation on the first
 day and at rollover. If access fails, preserve workspace evidence and report the
 notice-write blocker. At append time, workers use the local completion date's
-~/.daily/YYYY/MM/DD/notifications.md, create its missing directory, and append one
+~/daily/YYYY/MM/DD/notifications.md, create its missing directory, and append one
 `- [ ]` entry per completion ID: task and completion IDs, local timestamp with
 timezone offset, observed outcome or status, and exact artifact or result links.
 Return the actual timestamp and notice path in the workspace result or captured

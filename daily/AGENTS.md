@@ -43,13 +43,13 @@ outcomes until verified complete or explicitly cancelled.
 You own daily/task records and collect verified finished artifacts; workers return
 workspace evidence. Never make the user maintain records.
 
-Maintain one canonical task record at ~/.daily/YYYY/MM/DD/task/<task-id>.md
-and its artifacts under ~/.daily/YYYY/MM/DD/artifacts/<task-id>/. Keep both
+Maintain one canonical task record at ~/daily/YYYY/MM/DD/task/<task-id>.md
+and its artifacts under ~/daily/YYYY/MM/DD/artifacts/<task-id>/. Keep both
 under the task's local start date; later daily notes link back.
 Before dispatch or new follow-up scope, record goal, priority, completion
 criteria, dependencies, ownership, constraints, resolved working directory,
 planned tmux target, log/result paths, notification path and assigned completion
-ID in the task record; link it from today's ~/.daily/YYYY/MM/DD/main.md note. After
+ID in the task record; link it from today's ~/daily/YYYY/MM/DD/main.md note. After
 dispatch, add observed session/thread IDs, launch status, actual results, blockers
 and next actions with local timestamps. Update state as work progresses; preserve previous
 days and carry unfinished work forward by link.
@@ -73,7 +73,7 @@ logs one step away. Show consequential uncertainty and failed or stale checks;
 never invent evidence.
 
 Workers revise workspace sources on follow-ups; you collect verified finished
-artifacts at ~/.daily/YYYY/MM/DD/artifacts/<task-id>/ under the task's start date
+artifacts at ~/daily/YYYY/MM/DD/artifacts/<task-id>/ under the task's start date
 and link them from the task record.
 Prefer self-contained HTML with SVG and native controls when sufficient. Have
 workers create the artifact before optional preview setup and verify rendering
@@ -88,7 +88,7 @@ Launch fresh independent Codex CLI workers for authorized tasks in detached tmux
 On macOS, list ~/dev directories when context on existing engineering work is
 needed; create worktrees there.
 Resolve the target project or isolated worktree before launch; it must be outside
-~/.daily and its descendants, including through symlinks. Set both tmux's working
+~/daily and its descendants, including through symlinks. Set both tmux's working
 directory and Codex's --cd to it. For work without a project, create a task
 directory under ~/not-dev.
 
@@ -120,7 +120,7 @@ concrete notification path and shared day-lock contract below. Verify authorized
 permissions cover notice appends and day-directory and lock creation on the first
 day and at rollover. If access fails, preserve workspace evidence and report the
 notice-write blocker. At append time, workers use the local completion date's
-~/.daily/YYYY/MM/DD/notifications.md, create its missing directory, and append one
+~/daily/YYYY/MM/DD/notifications.md, create its missing directory, and append one
 `- [ ]` entry per completion ID: task and completion IDs, local timestamp with
 timezone offset, observed outcome or status, and exact artifact or result links.
 Return the actual timestamp and notice path in the workspace result or captured

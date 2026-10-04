@@ -115,6 +115,39 @@ class NotificationTests(unittest.TestCase):
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertEqual(len(self.argv()), 1)
 
+    def test_legacy_root_alias_shares_marker_and_resolves_visible_pointer(self):
+        legacy = self.root / ".daily"
+        legacy.symlink_to(self.daily, target_is_directory=True)
+        self.notifications.write_text("- [ ] first\n", encoding="utf-8")
+        self.assertEqual(self.check().queue_exit_code, 0)
+        result = watcher.check_notifications(legacy, "disposable-thread", today=self.day)
+        self.assertIsNone(result.queue_exit_code)
+        with (legacy / "2026/10/03/notifications.md").open("a") as notices:
+            notices.write("- [ ] second\n")
+        result = watcher.check_notifications(legacy, "disposable-thread", today=self.day)
+        self.assertEqual(result.queue_exit_code, 0)
+        self.assertEqual(self.marker.read_text(), "2\n")
+        self.assertEqual(self.argv()[-1][4], f"Check notifications file: {self.notifications.resolve()}")
+        self.assertIsNone(self.check().queue_exit_code)
+        self.assertEqual(len(self.argv()), 2)
+
+    def test_cli_default_uses_visible_daily_under_home(self):
+        visible = self.root / "daily"
+        directory = visible / self.day.strftime("%Y/%m/%d")
+        directory.mkdir(parents=True)
+        notifications = directory / "notifications.md"
+        notifications.write_text("- [ ] visible notice\n")
+        with patch.dict(os.environ, {"HOME": str(self.root)}), \
+                patch.object(sys, "argv", ["watch_notifications.py", "--thread", "disposable-thread"]), \
+                patch.object(watcher, "date") as local_date, \
+                patch.object(watcher.time, "sleep", side_effect=KeyboardInterrupt), \
+                contextlib.redirect_stdout(io.StringIO()):
+            local_date.today.return_value = self.day
+            self.assertEqual(watcher.main(), 0)
+        self.assertEqual(self.argv()[0][4], f"Check notifications file: {notifications.resolve()}")
+        self.assertEqual((directory / watcher.MARKER_NAME).read_text(), "1\n")
+        self.assertFalse((self.root / ".daily").exists())
+
     def test_local_day_rollover_uses_independent_file_and_marker(self):
         self.notifications.write_text("- [ ] old day\n", encoding="utf-8")
         next_directory = self.daily / "2026/10/04"
