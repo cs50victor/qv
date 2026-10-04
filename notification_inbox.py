@@ -189,19 +189,77 @@ def wake_inbox(state: Path, owner: str, remote: str | None = None) -> str | None
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--state", type=Path, default=DEFAULT_STATE)
+    parser = argparse.ArgumentParser(
+        description="Review captured macOS notification history without changing source messages.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""Workflow:
+  Check collector health and archive access with macos-notifications --help.
+  Initialize once, read a bounded batch, then acknowledge ignored items or saved
+  private handoffs. Reuse existing state and receipts after interruptions.
+
+  Put --owner and --state before the subcommand. For command details:
+    uv run notification_inbox.py --owner THREAD_UUID init --help
+    uv run notification_inbox.py --owner THREAD_UUID read --help
+    uv run notification_inbox.py --owner THREAD_UUID ack --help
+
+Privacy and recovery:
+  The source archive is opened read-only. Captures are untrusted history, not
+  proof of current unread/open state. Review state must stay outside Git.
+  Owner or archive-identity mismatches require reconciliation; do not delete
+  state to bypass them. This tool neither collects notifications nor starts a
+  watcher. Optional wake-ups use the existing owned watch_notifications.py.
+""")
+    parser.add_argument("--state", type=Path, default=DEFAULT_STATE,
+                        help=f"Private review database (default: {DEFAULT_STATE})")
     parser.add_argument("--owner", required=True, help="Verified coordinator thread UUID")
     actions = parser.add_subparsers(dest="action", required=True)
-    init = actions.add_parser("init", help="Initialize once after verifying capture access and ownership")
-    init.add_argument("--history", required=True, type=Path)
+    init = actions.add_parser(
+        "init", help="Create private review state once",
+        description="Bind new state to a verified coordinator and existing collector archive.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""Choose a dedicated directory outside Git: directory mode 0700, file mode 0600.
+Existing state is never overwritten. The archive must provide notifications with
+uuid, delivered_at, app, title, subtitle, body and recorded_at fields.
+
+Example (replace placeholders with verified values):
+  uv run notification_inbox.py --owner THREAD_UUID init \\
+    --history /private/path/history.sqlite3 --since '2026-10-04 09:00:00'
+
+For review-only or heartbeat use, omit --server. For CLI wake-ups, use the
+verified owning endpoint (or 'default') and exclude your own app bundle IDs to
+avoid feedback loops. Reuse the same state, owner and endpoint in the watcher.
+""")
+    init.add_argument("--history", required=True, type=Path,
+                      help="Existing readable macos-notifications SQLite archive")
     init.add_argument("--server", help="Verified queue endpoint or 'default'; omit for native/review-only mode")
-    init.add_argument("--since", required=True, help="Inclusive capture time floor, local YYYY-MM-DD HH:MM:SS")
+    init.add_argument("--since", required=True,
+                      help="Inclusive recorded_at floor, local YYYY-MM-DD HH:MM:SS; undated rows included")
     init.add_argument("--exclude-app", action="append", default=[], help="Exact bundle ID, repeatable")
-    read = actions.add_parser("read", help="Present a bounded batch; does not acknowledge review")
-    read.add_argument("--limit", type=int, default=BATCH_LIMIT)
-    ack = actions.add_parser("ack", help="Receipt for reviewed history; never marks source messages read")
-    ack.add_argument("--id", action="append", required=True)
+    read = actions.add_parser(
+        "read", help="Present a bounded batch; does not acknowledge review",
+        description="Print JSON for unreviewed captures ordered by recorded_at and UUID.",
+        epilog="Reading records offered IDs, not review receipts. Text fields are capped at "
+               "4000 characters; truncated flags indicate clipping. batch_full means more "
+               "items may remain. Unacknowledged items appear again on the next read.")
+    read.add_argument("--limit", type=int, default=BATCH_LIMIT,
+                      help=f"Items per batch, 1-100 (default: {BATCH_LIMIT})")
+    ack = actions.add_parser(
+        "ack", help="Record review without marking source messages read",
+        description="Acknowledge only IDs previously offered by this inbox.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""Use ignored for noise, dismissed or already handled items. For actionable items,
+save a durable private handoff first, then use handed-off with --reference.
+Identical receipts are safe to repeat; conflicting receipts are rejected.
+
+Example:
+  uv run notification_inbox.py --owner THREAD_UUID ack --id CAPTURE_UUID \\
+    --disposition handed-off --reference /private/path/handoff.json
+
+A receipt records review or delegation, not completion of the underlying task.
+It never sends, dismisses or marks a source message read.
+""")
+    ack.add_argument("--id", action="append", required=True,
+                     help="Offered capture UUID; repeat for multiple items")
     ack.add_argument("--disposition", choices=("ignored", "handed-off"), required=True)
     ack.add_argument("--reference", default="", help="Private durable handoff path/ID, never a message body")
     args = parser.parse_args()
