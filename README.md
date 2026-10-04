@@ -35,6 +35,56 @@ to delegate execution, track dependencies and worker IDs in `~/.daily`, verify
 results, and report status by goal without requiring worker-session switching.
 This behavior is prompt-driven; the script does not implement a separate scheduler.
 
+## Global preferences and daily coordinator
+
+Two complete, copy-paste-ready instruction files are included; the templates are
+kept below the repository root to avoid loading daily rules for qv workers:
+
+| File | Install at | Applies to |
+| --- | --- | --- |
+| [global/AGENTS.md](global/AGENTS.md) | `~/.codex/AGENTS.md` | Development preferences in every project |
+| [daily/AGENTS.md](daily/AGENTS.md) | `~/.daily/AGENTS.md` | Daily orchestration, visual artifacts, and brief chat |
+
+Review existing destination files before replacing them, preserving any local
+rules you need. If the global path is a symlink, writing through it also updates
+its shared target. From this checkout:
+
+```sh
+mkdir -p ~/.codex ~/.daily
+cp global/AGENTS.md ~/.codex/AGENTS.md
+cp daily/AGENTS.md ~/.daily/AGENTS.md
+codex --cd ~/.daily
+```
+
+In the Codex app, select `~/.daily` as the coordinator's project directory and
+start a new conversation to load the files. Codex layers global and project
+instructions; without a detected project root it checks only the current
+directory, so start at `~/.daily` rather than assuming a nested folder inherits it.
+
+The coordinator starts fresh Codex CLI processes in detached tmux sessions, with
+both tmux and Codex working in the target project or its isolated workspace.
+Workers never start in `~/.daily` or its descendants, including symlink aliases;
+they load global development preferences and their target project's instructions.
+They do not inherit the daily prompt or coordinator history through subagents,
+forks, resumes, or forwarded developer instructions.
+
+The coordinator maintains daily records and collects finished artifacts under
+`~/.daily/artifacts/<task-id>/`. Substantive explanations become diagrams,
+drawings, interactive HTML, or rendered Manim videos when motion helps; simple
+answers and requested prose stay in chat. Preview support, steering, and worker
+lifetimes depend on the runtime and are verified rather than promised.
+
+For the optional voice interface, explicitly supply the daily coordinator prompt:
+
+```sh
+uv run voice.py --cwd ~/.daily --prompt ~/.daily/AGENTS.md
+uv run voice.py --text --prompt ~/.daily/AGENTS.md
+```
+
+Use one interface at a time and the same prompt when switching. The default
+`prompt.txt` retains the legacy native-subagent coordinator; use the daily file
+for tmux workers and visual delivery.
+
 ## Switch between voice and CLI
 
 1. Stop voice with Ctrl+C. Copy the ID printed as `Codex: <thread-id>`, or read

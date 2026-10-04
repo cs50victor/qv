@@ -129,7 +129,7 @@ class Bridge:
             if status == "completed":
                 await self.result(final or "The coordinator turn ended without a text response. Do not infer task completion.")
             else:
-                await self.say("The Codex turn stopped before completion. I need to inspect task status before claiming success.")
+                await self.say("The Codex turn stopped before completion. I need to check task status before claiming success.")
         except asyncio.CancelledError:
             raise
         except Exception as exc:
@@ -318,7 +318,8 @@ def resume_text(prompt):
     instructions = prompt + (
         "\nCurrent interface: Codex CLI text mode. The user is typing directly to you; "
         "no voice session, microphone, audio output, or GPT Live relay is connected. "
-        "Respond directly in written Markdown, with code and detail when useful. "
+        "Respond directly in written Markdown according to the supplied prompt's "
+        "delivery preferences. "
         "Do not behave as a speech backend, wait for voice delegation, or claim to "
         "hear or speak. Earlier voice-mode instructions describe the previous interface, "
         "not this one. Continue as the same Astra orchestrator with the same goals, "
