@@ -66,8 +66,10 @@ owning-server endpoint from the known connection and check `codex queue --help` 
 the actual launch environment.
 
 Record the watcher owner, resolved daily root/script, target, tmux target, and
-writable log path before launch. Use at most one active watcher for the shared daily root;
-unknown existing ownership blocks another. After these checks, replace the checkout
+writable log path before launch. Use at most one notification watcher total in
+detached tmux, targeting your coordinator thread only. Workers append notices and
+never start watchers. This watcher owns the shared daily root; unknown existing
+ownership blocks another. After these checks, replace the checkout
 and log paths below. The shell guard checks absence only; UUID and metadata
 validation are preceding coordinator steps, not implemented by this snippet:
 
@@ -116,6 +118,8 @@ specified command overrides routing defaults. Astra records goals and planned
 launch metadata in `~/.daily` before dispatch, then observed IDs and actual results,
 reviews evidence, and reports status by goal without worker-session switching.
 This behavior is prompt-driven; the script does not implement a separate scheduler.
+Every research or execution request is recorded before switching scope; status and
+turn-end reconciliation include earlier and deferred outcomes.
 
 ## Global preferences and daily coordinator
 
