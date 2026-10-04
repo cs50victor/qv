@@ -31,5 +31,3 @@ Tie validation claims to the current revision and distinguish observations from 
 ## Safety
 
 Preserve unrelated work and user edits; never expose credentials. Stay within authorization for destructive or external actions and do not claim monitoring or background persistence without verification.
-
-Treat `cs50victor/msai-hci-2026` as read-only: before any staging, commit-producing action, push, merge, tag, release, or repository content write, show the exact repository, proposed diff, and commit message, and obtain my explicit approval for that change in the current conversation; general task requests and prior approvals do not count.
