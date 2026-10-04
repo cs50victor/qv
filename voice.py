@@ -7,8 +7,8 @@
 Switch between voice and CLI using the same conversation:
 1. Stop voice with Ctrl+C. Its ID is printed as Codex: <thread-id> and saved
    beside this script in .state/thread.json after the first delegated request.
-2. Run uv run voice.py --text to resume that thread with the current prompt.txt.
-3. Exit the CLI, then run this script with the same --cwd to resume voice.
+2. Run uv run voice.py --text with the same --prompt selection to resume that thread.
+3. Exit the CLI, then use the same --cwd and --prompt selection to resume voice.
 Do not use --new when switching; it starts a different conversation.
 Use one interface at a time. This resumes history, not the prior audio session.
 """
@@ -108,8 +108,9 @@ class Bridge:
     async def result(self, text):
         for chunk in list(chunks(text))[:20]:
             await self.connection.session.thinking.append(delegation_id=None, content=chunk)
-        await self.say("Give a brief spoken summary of the verified result just supplied. "
-                       "The full result remains in the Codex conversation.")
+        await self.say("Give a brief spoken summary of the coordinator response just supplied, "
+                       "preserving its status and uncertainty. A completed turn does not prove task completion. "
+                       "The full response remains in the Codex conversation.")
 
     async def consume(self):
         final, status = "", None
@@ -196,10 +197,8 @@ async def voice(args, prompt):
         async with AsyncCodex(config=CodexConfig(cwd=str(args.cwd))) as codex:
             options = dict(model="gpt-6-astra", cwd=str(args.cwd),
                            sandbox=Sandbox.full_access, approval_mode=ApprovalMode.deny_all,
-                           config={"features.multi_agent": True},
-                           developer_instructions=prompt + "\nCurrent interface: voice mode. You are the Codex reasoning orchestrator. "
-                           "GPT Live handles audio. You receive transcripts; do not claim to hear audio. "
-                           "Use native Codex subagents for substantial work, not Queue desktop MCP tools. "
+                           developer_instructions=prompt + "\nCurrent interface: voice mode. You, the coordinator, receive transcripts from GPT Live. "
+                           "GPT Live handles audio; do not claim to hear audio. "
                            "Keep your own turns short so the user can keep talking. "
                            "All task status claims require verified evidence.")
             if state_path.exists():
@@ -259,9 +258,11 @@ async def voice(args, prompt):
 
                 await connection.session.start(session={
                     "model": "gpt-live-1",
-                    "instructions": prompt + "\nYou are GPT Live, the voice interface. "
-                    "Delegate actions, research, task coordination and missing context to Astra through client delegation. "
-                    "Astra has a persistent Codex conversation and native subagents. "
+                    "instructions": "You are GPT Live, Queue's voice interface. "
+                    "Forward explanation requests, tool actions, research, deliverable requests, task coordination, "
+                    "and missing context to Astra through client delegation. Answer other questions from available "
+                    "conversation or supplied evidence. "
+                    "Astra is the persistent coordinator and applies the selected prompt's routing and delivery preferences. "
                     "Keep listening while it works. Speak briefly, allow interruptions, and never invent task results. "
                     "Do not repeat completed actions on restart; ask the backend to recover context when necessary.",
                     "audio": {"format": {"type": "audio/pcm", "rate": RATE}, "output": {"voice": "marin"}},
@@ -327,7 +328,7 @@ def resume_text(prompt):
     )
     return subprocess.run([
         "codex", "resume", saved["thread_id"], "--cd", str(cwd),
-        "--model", "gpt-6-astra", "--enable", "multi_agent",
+        "--model", "gpt-6-astra",
         "--config", "developer_instructions=" + json.dumps(instructions, ensure_ascii=False),
     ], check=False).returncode
 
