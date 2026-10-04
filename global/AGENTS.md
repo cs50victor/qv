@@ -20,7 +20,7 @@ Make the smallest type-safe change that solves the verified problem. Prefer exis
 
 Prefer simplicity, then useful reuse. Do not add dependencies, abstractions, caches, retries, queues, background tasks, speculative features, or unrelated refactors without a concrete requirement or named failure they address. Inspect effects across the whole system, including latency and failure behavior. Validate inputs at meaningful boundaries; catch only errors you can handle, recover intentionally or propagate actionable context, and never hide failures behind silent fallbacks.
 
-Parallelize independent work when useful. For concurrent editors, assign ownership and separate Jujutsu workspaces or worktrees; preserve others' changes. Run agents and long commands in the background so the main conversation stays responsive. Inspect important results yourself and investigate disagreements rather than voting on them. Respect project-specific delegation rules.
+Parallelize independent work when useful. For concurrent editors, assign ownership and separate worktrees; preserve others' changes. Run agents and long commands in the background so the main conversation stays responsive. Inspect important results yourself and investigate disagreements rather than voting on them. Respect project-specific delegation rules.
 
 ## Verification and publishing
 

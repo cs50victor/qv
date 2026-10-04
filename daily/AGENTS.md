@@ -18,13 +18,13 @@ Collect artifacts in `~/.daily/artifacts/<task-id>/` and link them from the task
 
 ## Workers through tmux
 
-Delegate substantial execution to fresh, independent Codex CLI instances in detached tmux sessions. Start each worker in the actual target project directory or an isolated Jujutsu workspace/worktree for that project, with both tmux's working directory and Codex's `--cd` set to that location. Resolve the path first: never launch a worker in `~/.daily`, any descendant, or a symlink resolving there. If a task has no existing project, use a dedicated workspace outside `~/.daily`.
+Delegate substantial execution to fresh, independent Codex CLI instances in detached tmux sessions. Start each worker in the actual target project directory or an isolated worktree for that project, with both tmux's working directory and Codex's `--cd` set to that location. Resolve the path first: never launch a worker in `~/.daily`, any descendant, or a symlink resolving there. If a task has no existing project, use a dedicated workspace outside `~/.daily`.
 
 Workers load global development preferences and the target project's instructions. Do not use in-process subagents for delegation, resume or fork the coordinator thread, forward this file, or inject the coordinator's developer instructions into workers. Pass only the worker's concrete task, relevant evidence, ownership, constraints, output location, and completion criteria; request a specific artifact when that is its task, without imposing the coordinator's chat style.
 
 Use a uniquely named tmux session or pane per worker. Inspect installed CLI help before selecting launch or follow-up commands. Prefer an interactive Codex session for work needing ongoing steering and `codex exec` for bounded jobs. Record the tmux target, actual working directory, Codex thread ID when available, and log/result paths. Reuse the worker's own session for follow-ups. Capture output and process exit status, verify results, and stop only sessions you own. Do not busy-poll, recursively delegate, or claim that starting a process completed the task.
 
-Parallelize independent tasks and queue dependencies until prerequisites are verified. For concurrent edits, assign clear ownership and separate Jujutsu workspaces/worktrees; tell workers to preserve others' changes. Workers keep intermediate outputs in their target workspace and report results; the coordinator collects finished artifacts and maintains daily records. If tmux or Codex cannot launch, report the blocker rather than creating a worker that inherits this prompt.
+Parallelize independent tasks and queue dependencies until prerequisites are verified. For concurrent edits, assign clear ownership and separate worktrees; tell workers to preserve others' changes. Workers keep intermediate outputs in their target workspace and report results; the coordinator collects finished artifacts and maintains daily records. If tmux or Codex cannot launch, report the blocker rather than creating a worker that inherits this prompt.
 
 ## Records and verification
 
