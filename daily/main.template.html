@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily checklist example</title>
+  <!-- Play CDN is for local development; the inline CSS also works offline. -->
+  <script async src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #202020; background: #fff; }
+    body { max-width: 52rem; margin: 0 auto; padding: 2rem 1rem; line-height: 1.5; }
+    h1 { font-size: 1.5rem; font-weight: 600; margin: 0 0 .5rem; }
+    a { color: #24568a; text-decoration: underline; overflow-wrap: anywhere; }
+    p { margin: .4rem 0; }
+    .legend, .context { color: #525252; font-size: .875rem; }
+    .legend { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin: .8rem 0; }
+    .legend span { white-space: nowrap; }
+    .tasks { list-style: none; padding: 0; margin: 1.4rem 0; }
+    .task { margin: 0; padding: .8rem 0; border-bottom: 1px solid #e5e5e5; }
+    .task-line { display: flex; align-items: baseline; gap: .65rem; }
+    .task-line > div { min-width: 0; }
+    .status { display: inline; margin-left: .4rem; font-size: .875rem; color: #525252; }
+    [data-status="not-started"] { --state-color: #737373; --state-mark: ""; --state-label: "Not started"; }
+    [data-status="in-progress"] { --state-color: #facc15; --state-mark: "−"; --state-label: "In progress"; }
+    [data-status="completed"] { --state-color: #15803d; --state-mark: "✓"; --state-label: "Completed"; }
+    [data-status="blocked"] { --state-color: #b91c1c; --state-mark: "!"; --state-label: "Blocked"; }
+    .status:not(.ready)::before { content: var(--state-label); }
+    .state-box { appearance: none; -webkit-appearance: none; box-sizing: border-box; flex: 0 0 1.1rem;
+      width: 1.1rem; height: 1.1rem; margin: 0; border: 1px solid var(--state-color); border-radius: 3px;
+      background: var(--state-color); opacity: 1; position: relative; top: .18rem; }
+    [data-status="not-started"] .state-box { background: white; }
+    .state-box::after { content: var(--state-mark); position: absolute; inset: -3px 0 0; text-align: center;
+      font: 700 .95rem/1.3 system-ui, sans-serif; color: white; }
+    [data-status="in-progress"] .state-box::after { color: #422006; }
+    .swatch { display: inline-block; width: .7rem; height: .7rem; background: var(--state-color); border: 1px solid var(--state-color); }
+    [data-status="not-started"] .swatch { background: white; }
+    .task-note { margin: .4rem 0 0 1.75rem; color: #525252; font-size: .875rem; }
+    .blocker { color: #991b1b; margin: .4rem 0 0 1.75rem; }
+    details { margin: .5rem 0 0 1.75rem; }
+    summary { cursor: pointer; color: #525252; font-size: .875rem; }
+    .notes { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .9rem; }
+    .history { margin: 1.5rem 0; }
+    :focus-visible { outline: 2px solid #24568a; outline-offset: 3px; }
+  </style>
+</head>
+<body class="mx-auto max-w-4xl px-4 py-8 text-neutral-900">
+  <h1>Daily checklist example</h1>
+  <p class="context">Synthetic examples. Copy this page into the local day directory and replace the task rows and notes.</p>
+  <div class="legend" aria-label="Status legend">
+    <span data-status="not-started"><i class="swatch" aria-hidden="true"></i> Not started</span>
+    <span data-status="in-progress"><i class="swatch" aria-hidden="true"></i> In progress</span>
+    <span data-status="completed"><i class="swatch" aria-hidden="true"></i> Completed</span>
+    <span data-status="blocked"><i class="swatch" aria-hidden="true"></i> Blocked</span>
+  </div>
+  <p class="context">Read-only status, updated by the agent from task records. Open Markdown links in your editor or repository viewer.</p>
+  <ul class="tasks">
+    <!-- Keep each ID stable. Change data-status, not checked attributes or browser storage. -->
+    <li class="task" id="example-outline" data-status="not-started">
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Draft outline status"><div><a href="task/example-outline.md">Draft outline</a><span class="status"></span></div></div>
+      <details><summary>Agent notes</summary><p>Priority: next. Begin after the current review. The linked task is a placeholder to replace when copying this template.</p></details>
+    </li>
+    <li class="task" id="example-review" data-status="in-progress">
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Review draft status"><div><a href="task/example-review.md">Review draft</a><span class="status"></span></div></div>
+      <details><summary>Agent notes</summary><p>Owner: review worker. Evidence review is advancing. Next: record findings and verify corrections.</p></details>
+    </li>
+    <li class="task" id="example-research" data-status="completed">
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Research options status"><div><a href="task/example-research.md">Research options</a><span class="status"></span></div></div>
+      <details><summary>Agent notes</summary><p>Requested research was reviewed against its completion criteria. Findings and limitations belong in the canonical record.</p></details>
+    </li>
+    <li class="task" id="example-access" data-status="blocked">
+      <div class="task-line"><input class="state-box" type="checkbox" disabled aria-label="Verify access status"><div><a href="task/example-access.md">Verify access</a><span class="status"></span></div></div>
+      <p class="blocker">Blocked: the required account owner has not granted access. Next: verify access when that dependency changes.</p>
+      <details><summary>Agent notes</summary><p>Prepared work is retained. No duplicate request or unauthorized action is implied by this status.</p></details>
+    </li>
+  </ul>
+  <details class="history"><summary>History and context</summary><p>Keep prior outcomes, evidence and useful detail here or in linked Markdown artifacts. Preserve an existing main note byte-for-byte before migration.</p></details>
+  <noscript><p>JavaScript is disabled. Colors and labels still show source status; native indeterminate properties require JavaScript. Consult the linked task records.</p></noscript>
+  <script>
+    // data-status is authoritative; controls are a read-only projection, never an editor.
+    const labels = { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Completed', blocked: 'Blocked' };
+    for (const row of document.querySelectorAll('.task[data-status]')) {
+      const status = row.dataset.status;
+      const box = row.querySelector('input[type="checkbox"]');
+      const label = row.querySelector('.status');
+      box.checked = status === 'completed';
+      box.indeterminate = status === 'in-progress';
+      label.textContent = labels[status] || 'Unknown status: review task record';
+      label.classList.add('ready');
+      box.setAttribute('aria-label', `${row.querySelector('a').textContent}: ${label.textContent}`);
+    }
+  </script>
+</body>
+</html>
