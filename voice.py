@@ -129,7 +129,7 @@ class Bridge:
             if status == "completed":
                 await self.result(final or "The coordinator turn ended without a text response. Do not infer task completion.")
             else:
-                await self.say("The Codex turn stopped before completion. I need to inspect task status before claiming success.")
+                await self.say("The Codex turn stopped before completion. I need to check task status before claiming success.")
         except asyncio.CancelledError:
             raise
         except Exception as exc:
