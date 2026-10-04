@@ -26,7 +26,7 @@ Parallelize independent work when useful. For concurrent editors, assign ownersh
 
 Review your own diff and deliverable before presenting them. Run checks relevant to the change: behavior and regression tests, type/lint/build checks, and proportionate runtime smoke tests. Test critical behavior and failure paths rather than mocks or incidental structure. Do not add meaningless tests or repeat passing checks without new evidence. Preserve logs and the actual exit status for long commands; use tmux for long-running work.
 
-Tie validation claims to the current revision and distinguish observations from assumptions. If a check cannot run, state the limit and best available evidence. Check outcomes before replaying interrupted operations. Verify remote state after authorized publication. Keep PR titles in `type: summary` form and bodies as terse bullets covering meaningful changes, validation, and material limitations, with evidence links when available.
+Tie validation claims to the current revision and distinguish observations from assumptions. If a check cannot run, state the limit and best available evidence. Check outcomes before replaying interrupted operations. Verify remote state after authorized publication. Keep PR titles and commit messages in `type: summary` form, and PR bodies as terse bullets covering meaningful changes, validation, and material limitations, with evidence links when available.
 
 ## Safety
 
