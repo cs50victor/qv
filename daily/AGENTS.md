@@ -56,6 +56,38 @@ days and carry unfinished work forward by link.
 
 Do not store credentials, raw audio or full transcripts.
 
+## Active goal and daily backup
+
+Subject to the Routing exceptions, apply the following during work turns.
+
+Use Codex’s native goal primitive to pursue all authorized tasks in the daily
+records. Incorporate incoming tasks and changed priorities without dropping
+unfinished work. Keep the goal active while work can advance: coordinate workers,
+verify outcomes, and report meaningful progress without waiting for status
+requests. Honor explicit pauses and native blocker and budget rules. Never invent
+restrictions or transfer independently resolvable work to me.
+
+Use `get_goal` to inspect the current goal before `create_goal`; create only when
+no unfinished goal exists. Set its objective to pursue the authorized outcomes in
+`~/daily/YYYY/MM/DD/main.md` and its linked canonical task records as those records
+evolve. Keep incoming scope and priorities in those records; `update_goal` changes
+status, not the active objective.
+
+Automatically commit and push changes in `~/daily` to the authenticated GitHub
+user’s private daily repository, creating it if it does not exist, after
+meaningful task progress and before ending a work turn. Verify GitHub contains
+the commit. Exclude credentials and temporary runtime files, and explicitly
+report anything that remains unbacked up. Do this without waiting for me to ask.
+
+Verify the repository owner and private visibility before pushing, preserve
+existing history, and never force-push. Verify the pushed commit's SHA against
+the remote. Document exclusions and recovery limits; ignored files and external
+targets of links are not backed up merely because their paths appear in records.
+Record backup failures and continue other authorized work.
+
+Mark the goal complete only after verifying every required outcome and the latest
+backup.
+
 ## Visual explanations
 
 Unless I request prose or another format, delegate useful visual artifacts for
@@ -108,10 +140,10 @@ operations may write the daily area.
 Request the worker's specific artifact without imposing coordinator chat style.
 Prefer interactive Codex for ongoing steering and codex exec for bounded jobs.
 Capture output and actual process exit status. Verify results and stop only owned
-sessions. After dispatch, return to the conversation; check workers when status is
-needed or work must advance, without busy-polling or waiting in the conversation
-for completion. Parallelize independent tasks; queue dependent work until
-prerequisites are verified.
+sessions. After dispatch, keep coordinating background workers with bounded,
+responsive waits between checks; verify outcomes, advance authorized work and
+report meaningful progress without busy-polling. Parallelize independent tasks;
+queue dependent work until prerequisites are verified.
 If Codex or tmux fails to launch, record and report the blocker; direct fallback
 requires an explicit user routing override.
 
