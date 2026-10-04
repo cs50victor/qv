@@ -67,7 +67,8 @@ active, workers append notices and do not also enqueue them. The watcher sends o
 `Check notifications file: <absolute notice path under the resolved daily root>`;
 details stay in the file. The watcher resolves the root, then constructs
 `YYYY/MM/DD/notifications.md`; it does not resolve day or file symlinks in the
-pointer. Journal sync and automatic voice announcements are not implemented.
+pointer. The scripts do not implement journal sync or automatic voice
+announcements; the daily prompt directs the coordinator to back up records.
 
 ### Notification watcher
 
@@ -162,6 +163,18 @@ kept below the repository root to avoid loading daily rules for qv workers:
 | --- | --- | --- |
 | [global/AGENTS.md](global/AGENTS.md) | `~/.codex/AGENTS.md` | Development preferences in every project |
 | [daily/AGENTS.md](daily/AGENTS.md) | `~/daily/AGENTS.md` | Daily orchestration, visual artifacts, and brief chat |
+
+qv's `daily/AGENTS.md` is the authoritative daily prompt source; sync reviewed
+changes to the installed copy. It directs the coordinator to keep a native goal
+active against evolving canonical records, coordinate through responsive bounded
+waits, and verify private GitHub backups at meaningful checkpoints and before
+ending work turns. Standalone-answer and only-command exceptions still apply.
+
+To recover daily records, clone the authenticated user's private `daily`
+repository into a separate directory, verify the recorded backup commit, then
+restore needed files without overwriting newer local work. Only pushed contents
+are recoverable this way; consult the recorded exclusions for ignored files and
+external artifacts. Reconcile the recovered prompt with qv before installing it.
 
 Review existing destination files before replacing them, preserving any local
 rules you need. If the global path is a symlink, writing through it also updates
