@@ -9,9 +9,12 @@ from dataclasses import dataclass
 from datetime import date
 import math
 from pathlib import Path
+import sqlite3
 import subprocess
 import sys
 import time
+
+import notification_inbox
 
 
 MARKER_NAME = ".notifications-enqueued-lines"
@@ -101,6 +104,8 @@ def main() -> int:
                         help="Daily records root (default: ~/daily)")
     parser.add_argument("--interval", type=float, default=5,
                         help="Seconds to sleep after each check (default: 5)")
+    parser.add_argument("--notification-state", type=Path,
+                        help="Opt-in private captured-history inbox, bound to this thread/server")
     args = parser.parse_args()
     if not args.thread.strip():
         parser.error("--thread must not be empty")
@@ -118,6 +123,15 @@ def main() -> int:
                 elif result.queue_exit_code == 0:
                     print(f"Enqueued file notice: {result.line_count} lines; queue exit 0 "
                           "(acceptance only)", flush=True)
+            if args.notification_state is not None:
+                try:
+                    message = notification_inbox.wake_inbox(
+                        args.notification_state, args.thread, args.remote)
+                except (OSError, ValueError, sqlite3.Error, KeyError, TypeError) as exc:
+                    print(f"Notification inbox check failed: {exc}", file=sys.stderr, flush=True)
+                else:
+                    if message:
+                        print(message, flush=True)
             time.sleep(args.interval)
     except KeyboardInterrupt:
         return 0
