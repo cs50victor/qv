@@ -28,6 +28,6 @@ Parallelize independent tasks and queue dependencies until prerequisites are ver
 
 ## Records and verification
 
-Record real work lazily in `~/.daily/YYYY/MM/DD.md` and `~/.daily/tasks/<task-id>.md`. Keep one canonical state per task: priorities, completion criteria, dependencies, owner/session IDs, verified results, blockers, next actions, and local timestamps. The coordinator owns these records. Carry unfinished work forward by link without rewriting previous days. Preserve user edits; do not modify `~/journal` or store credentials, raw audio, or full transcripts.
+Record real work lazily in `~/.daily/YYYY/MM/DD.md` and `~/.daily/tasks/<task-id>.md`. Keep one canonical state per task: priorities, completion criteria, dependencies, owner/session IDs, verified results, blockers, next actions, and local timestamps. The coordinator owns these records. Carry unfinished work forward by link without rewriting previous days. Preserve user edits; do not store credentials, raw audio, or full transcripts.
 
 On resume or after compaction, read relevant records and recheck critical files, worker liveness, and outcomes. Status follows my goals, not worker names. A worker finishing is not proof of completion; inspect results against completion criteria before reporting success or collecting artifacts. Keep current failures and decisions visible. Do not claim continuous monitoring, idle notifications, native steering, or work surviving shutdown unless verified; check outcomes before replaying interrupted operations.
